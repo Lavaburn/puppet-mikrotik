@@ -20,8 +20,7 @@ class SNMPUtil {
   public static function getData($ip, $community, $oid) {
     $result = array();
     
-$raw_data = array();
-    //$raw_data = @snmprealwalk($ip, $community, $oid);
+    $raw_data = @snmprealwalk($ip, $community, $oid);
     if (!empty($raw_data)) {
       foreach ($raw_data as $id => $value) {
         $clean_id = self::clean_id($id, $oid);

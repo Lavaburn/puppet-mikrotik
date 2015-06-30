@@ -44,7 +44,6 @@ $DB->query("UPDATE bsr_check SET snmp_last_result = 'RUNNING' WHERE ip = '$IP'")
 
 $exit_status = "SUCCESS";
 
-
 // SNMP Fetch
 // A1 - BSR VLAN Configuration - Service Class
 $VLANs = array();
@@ -98,7 +97,6 @@ foreach ($cpe_config_tagged as $oid_suffix => $type) {
   
   $ms_config[$MAC]["allowed"][$VLAN] = ($type==0?1:0);//Swap 0 and 1
 }
-
 
 // C - CPE List - RF Statistics
 $ms_stats = array();

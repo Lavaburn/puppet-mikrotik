@@ -91,19 +91,15 @@ class AirspanDB {
           $this->DB->query("INSERT INTO ms_vlan_config VALUES ('$MAC', '$VLAN', '$tagged', '$now', '1')");
         } else if ($vlan_count == 1) {
           //VLAN for CPE already exists in DB
-
+          
           if ($vlan_config_db["tagged"] != $tagged) {
-            LogUtil::info(MODULE, "Airspan MS $MAC has VLAN $VLAN with changed tag type.");       
-
-            //TODO
-            LogUtil::warning(MODULE, "DEBUG --".$vlan_config_db["tagged"]."-- VS --".$tagged."--", true);
-            
+            LogUtil::info(MODULE, "Airspan MS $MAC has VLAN $VLAN with changed tag type.");
             $cpe_updated = true;             
             
-            $this->DB->query("UPDATE ms_vlan_config SET tagged = '$tagged' $condition");
+            $this->DB->query("UPDATE ms_vlan_config SET tagged = '$tagged' $condition2");
           }
         
-          $this->DB->query("UPDATE ms_vlan_config SET last_checked = '$now' $condition");
+          $this->DB->query("UPDATE ms_vlan_config SET last_checked = '$now' $condition2");
         } else {
           //MAC+VLAN is PK, so absolutely impossible !
           LogUtil::critical(MODULE, "Airspan MS with MAC $MAC and VLAN $VLAN was found more than once in the Database !");
