@@ -6,6 +6,7 @@ require_once("/etc/rcs/airspan/settings.inc");
 
 require_once(ROOT."/common/db.inc");
 
+require_once(ROOT."/util/Curator.class.inc");
 require_once(ROOT."/util/GraphiteUtil.class.inc");
 require_once(ROOT."/util/LogUtil.class.inc");
 require_once(ROOT."/util/Ofbiz.class.inc");
@@ -18,6 +19,10 @@ Timer::start();
 $ofbiz = new Ofbiz($DB, OFBIZ_SERVER, OFBIZ_PORT);
 $stats = $ofbiz->pushRFstatistics();  
 
+//Curator - Archive Outdated RF Statistics
+$curator = new Curator($DB);
+$archive_stats = $curator->archiveStatistics();
+
 //Finish Run
 $runtime = round(Timer::stop());
 
@@ -29,6 +34,8 @@ $graph->send("stats.count.records", $stats["records"]);
 $graph->send("stats.status.success", $stats["upload"]["success"]);
 $graph->send("stats.status.failure", $stats["upload"]["failure"]);
 $graph->send("stats.runtime", $runtime);
+$graph->send("stats.archive.records", $archive_stats["records"]);
+$graph->send("stats.archive.days", $archive_stats["days"]);
 
 $DB->close();
 ?>
