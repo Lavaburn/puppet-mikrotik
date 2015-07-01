@@ -1,5 +1,5 @@
 <?php 
-snmp_set_oid_numeric_print(true);// PHP 4 ?
+snmp_set_oid_numeric_print(true);                    // PHP 4.3.0
 snmp_set_oid_output_format(SNMP_OID_OUTPUT_NUMERIC); // PHP 5.2.0
 
 //define("OID_SYSTEM",				                  "1.3.6.1.2.1.1");

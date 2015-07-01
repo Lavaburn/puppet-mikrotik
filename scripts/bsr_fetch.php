@@ -179,7 +179,7 @@ $ofbiz_stats = $ofbiz->pushAirspanConfig($IP);
 $runtime = round(Timer::stop());
 
 //Push Stats to Graphite
-$graph = new GraphiteUtil(GRAPHITE_HOST, GRAPHITE_PORT, GRAPHITE_PREFIX);
+$graph = new GraphiteUtil(GRAPHITE_HOST, GRAPHITE_PORT, GRAPHITE_PREFIX.".config");
 $graph->send($bsr_shortname.".ms.online", $stats["cpe_online"]);
 $graph->send($bsr_shortname.".ms.updated", $stats["cpe_updated"]);
 $graph->send($bsr_shortname.".ms.new", $stats["cpe_new"]);
@@ -192,6 +192,14 @@ foreach ($ofbiz_stats as $action => $results) {
     $graph->send($bsr_shortname.".upload.$action.$result", $count);
   }
 } 
+
+//Push Full RF Statistics to Graphite (different prefix)
+$graph2 = new GraphiteUtil(GRAPHITE_HOST, GRAPHITE_PORT, GRAPHITE_PREFIX.".cpe");
+foreach ($ms_stats as $MAC => $ms) {
+  foreach ($ms as $metric => $value) {
+    $graph2->send($MAC.".$metric", $value);
+  }
+}
 
 //Close check record
 $DB->query("UPDATE bsr_check SET snmp_last_result = 'Status: $exit_status - Runtime: $runtime sec' WHERE ip = '$IP'");

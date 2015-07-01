@@ -40,7 +40,7 @@ require_once(ROOT."/common/db.inc");
       LogUtil::info(MODULE, $log);
       
       exec("nohup ".ROOT."/scripts/bsr_fetch.php ".$_POST["manual_check"]." > /dev/null 2>&1 &");     
-      sleep(15);
+      sleep(5);
       echo "<span class='alert'>SNMP check for BSR ".$_POST["manual_check"]." has been manually started.</span><br />";
     }    
     ?>    

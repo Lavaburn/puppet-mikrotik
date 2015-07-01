@@ -27,7 +27,7 @@ $archive_stats = $curator->archiveStatistics();
 $runtime = round(Timer::stop());
 
 //Push Stats to Graphite
-$graph = new GraphiteUtil(GRAPHITE_HOST, GRAPHITE_PORT, GRAPHITE_PREFIX);
+$graph = new GraphiteUtil(GRAPHITE_HOST, GRAPHITE_PORT, GRAPHITE_PREFIX.".config");
 $graph->send("stats.count.days", $stats["days"]);
 $graph->send("stats.count.cpes", $stats["cpes"]);
 $graph->send("stats.count.records", $stats["records"]);
