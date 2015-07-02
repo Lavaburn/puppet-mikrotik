@@ -58,6 +58,12 @@ class AirspanDB {
           LogUtil::info(MODULE, "Airspan MS $MAC has been updated since last check.");
           $cpe_updated = true;
           
+          //DEBUG
+          LogUtil::info(MODULE, "Airspan MS $MAC - VLAN TYPE: SNMP=-".$config["vlan_type"]."- vs. DB=-".$config_db["vlan_type"]."-");
+          LogUtil::info(MODULE, "Airspan MS $MAC - DEFAULT VLAN: SNMP=-".$config["default_vlan"]."- vs. DB=-".$config_db["default_vlan"]."-");
+          LogUtil::info(MODULE, "Airspan MS $MAC - BSR IP: SNMP=-".$this->BSR_IP."- vs. DB=-".$config_db["bsr_ip"]."-");
+          //END DEBUG
+          
           $this->DB->query("UPDATE ms_config SET vlan_type = '".$config["vlan_type"]."' $condition");
           $this->DB->query("UPDATE ms_config SET default_vlan = '".$config["default_vlan"]."' $condition");
           $this->DB->query("UPDATE ms_config SET bsr_ip = '".$this->BSR_IP."' $condition");
