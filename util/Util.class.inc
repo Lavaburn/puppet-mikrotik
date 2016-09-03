@@ -20,8 +20,8 @@ class Util {
   		$modulation_up = self::convertModcod($stats["modulation_up"]);
   		$modulation_down = self::convertModcod($stats["modulation_down"]);
   		
-  		self::increase($modcodTable, "x.uplink.matrix_a.".$modulation_up);
-  		self::increase($modcodTable, "x.downlink.".$mimo.".".$modulation_down);
+  		self::increase($modcodTable, "named.uplink.matrix_a.".$modulation_up);
+  		self::increase($modcodTable, "named.downlink.".$mimo.".".$modulation_down);
   	}
   	return $modcodTable;
   }

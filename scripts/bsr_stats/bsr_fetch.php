@@ -4,7 +4,7 @@
 // This script is called every 5 minutes by crontab.
 require_once("/etc/rcs/airspan/settings.inc");
 
-//require_once(ROOT."/common/db.inc");
+require_once(ROOT."/common/db.inc");
 
 require_once(ROOT."/util/GraphiteUtil.class.inc");
 require_once(ROOT."/util/LogUtil.class.inc");
