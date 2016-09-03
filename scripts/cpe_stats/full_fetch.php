@@ -24,7 +24,7 @@ while ($row = $bsr->fetch_assoc()) {
        //Previous check was less than x minutes ago
        LogUtil::warning(MODULE, "Previous check for BSR ".$row["name"]." was at ".$row["snmp_last_check"].". Will not start a new check now!");
      } else {
-       exec("nohup ".ROOT."/scripts/bsr_fetch.php ".$row["ip"]." > /dev/null 2>&1 &");
+       exec("nohup ".ROOT."/scripts/cpe_stats/bsr_fetch.php ".$row["ip"]." > /dev/null 2>&1 &");
      }
   }
 }

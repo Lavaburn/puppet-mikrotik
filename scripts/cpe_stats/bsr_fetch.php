@@ -16,7 +16,7 @@ require_once(ROOT."/util/Util.class.inc");
 
 //Parameters
 $IP = $argv[1];
-LogUtil::info(MODULE, "SNMP check for Airspan BSR $IP has been requested.");
+LogUtil::info(MODULE, "SNMP check for Airspan BSR $IP (Configuration) has been requested.");
 
 
 //Update Database - Script started
@@ -194,12 +194,12 @@ foreach ($ofbiz_stats as $action => $results) {
 } 
 
 //Push Full RF Statistics to Graphite (different prefix)
-$graph2 = new GraphiteUtil(GRAPHITE_HOST, GRAPHITE_PORT, GRAPHITE_PREFIX.".cpe");
+/*$graph2 = new GraphiteUtil(GRAPHITE_HOST, GRAPHITE_PORT, GRAPHITE_PREFIX.".cpe");
 foreach ($ms_stats as $MAC => $ms) {
   foreach ($ms as $metric => $value) {
     $graph2->send($MAC.".$metric", $value);
   }
-}
+}*/ // Moved to bsr_stats
 
 //Close check record
 $DB->query("UPDATE bsr_check SET snmp_last_result = 'Status: $exit_status - Runtime: $runtime sec' WHERE ip = '$IP'");
