@@ -1,0 +1,26 @@
+{
+  "name": "puppet-mikrotik",
+  "version": "0.1.0",
+  "author": "Lavaburn",
+  "summary": "This module provides resources for managing a Mikrotik device.",
+  "license": "Apache 2.0",
+  "source": "git://github.com/Lavaburn/puppet-mikrotik.git",
+  "project_page": "https://github.com/Lavaburn/puppet-mikrotik",
+  "issues_url": "https://github.com/Lavaburn/puppet-mikrotik/issues",
+  "tags": [
+    "mikrotik", "router"
+  ],
+  "operatingsystem_support": [
+    {
+      "operatingsystem": "Ubuntu",
+      "operatingsystemrelease": [ "14.04" ]
+    }
+  ],
+  "requirements": [
+    {
+      "name": "puppet",
+      "version_requirement": ">= 4.0.0"
+    }
+  ],
+  "dependencies": []
+}

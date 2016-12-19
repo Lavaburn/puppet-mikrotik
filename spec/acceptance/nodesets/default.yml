@@ -1,0 +1,20 @@
+HOSTS:
+  puppet:
+    roles:
+      - master
+    platform: ubuntu-14.04-x64
+    box: puppetlabs/ubuntu-14.04-64-puppet
+    box_url: https://vagrantcloud.com/puppetlabs/boxes/ubuntu-14.04-64-puppet
+    hypervisor: vagrant
+    vagrant_memsize: 4096
+  ubuntu-14-04:
+    roles:
+      - agent
+    platform: ubuntu-14.04-x64
+    box: puppetlabs/ubuntu-14.04-64-puppet
+    box_url: https://vagrantcloud.com/puppetlabs/boxes/ubuntu-14.04-64-puppet
+    hypervisor: vagrant
+CONFIG:
+  log_level: debug
+  type: aio
+  vagrant_memsize: 2048
