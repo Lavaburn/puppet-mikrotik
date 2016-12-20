@@ -35,9 +35,21 @@ describe 'reset configuration' do
         mikrotik_firewall_rule { 'Puppet Test 3':
           ensure   => 'absent',
         }
-#        mikrotik_address_list { 'MT_TEST_LIST':
-#          ensure => 'absent',
-#        }
+        mikrotik_address_list { 'MT_TEST_LIST':
+          ensure => 'absent',
+        }        
+        mikrotik_ip_service { 'telnet':
+          ensure => 'disabled',
+        }
+        mikrotik_ip_service { 'api-ssl':
+          ensure => 'enabled',
+        }
+        mikrotik_ip_service { 'www':
+          addresses => [],  # TODO - DOES NOT WORK?
+        }
+        mikrotik_ip_service { 'ftp':
+          port => 21,
+        }
       EOS
       
       set_site_pp_on_master(site_pp)

@@ -34,7 +34,7 @@ class Puppet::Provider::Mikrotik_Api < Puppet::Provider
     
     result = []
     objects.each do |object| 
-      Puppet.debug("Object: #{object}")        
+      #Puppet.debug("Object: #{object}")        
       
       if object.key?('!re')
         result << object.reject { |k, v| ['!re', '.tag'].include? k  }
@@ -98,7 +98,7 @@ class Puppet::Provider::Mikrotik_Api < Puppet::Provider
   end
   
   def exists?
-    @property_hash[:ensure] == :present
+    [:present, :enabled, :disabled].include?(@property_hash[:ensure]) 
   end
   
   def create
@@ -158,4 +158,13 @@ class Puppet::Provider::Mikrotik_Api < Puppet::Provider
       
     id_list
   end
+  
+  # Different ensure options can be stored in "state"
+  def setState(state)
+    @property_flush[:ensure] = state
+  end  
+  
+  def getState
+    @property_hash[:state]
+  end  
 end
