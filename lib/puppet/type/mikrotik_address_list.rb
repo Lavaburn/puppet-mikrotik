@@ -13,5 +13,13 @@ Puppet::Type.newtype(:mikrotik_address_list) do
 
   newproperty(:addresses, :array_matching => :all) do
     desc 'The IP addresses assigned to the list'
+
+    def insync?(is)
+      if is.is_a?(Array) and @should.is_a?(Array)
+        is.sort == @should.sort
+      else
+        is == @should
+      end
+    end
   end
 end

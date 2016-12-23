@@ -49,6 +49,21 @@ describe 'reset configuration' do
         }
         mikrotik_ip_service { 'ftp':
           port => 21,
+        }        
+        mikrotik_snmp { 'snmp':
+          ensure          => disabled,
+          contact         => "jubanoc@rcswimax.com",
+          location        => "South Sudan",
+          trap_version    => 1,
+          trap_community  => "public",
+          trap_generators => [],
+          trap_targets    => [],
+        }
+        mikrotik_snmp_community { 'test_ro':
+          ensure     => absent,
+        }
+        mikrotik_snmp_community { 'test_rw':
+          ensure     => absent,
         }
       EOS
       

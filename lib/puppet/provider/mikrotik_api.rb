@@ -51,10 +51,12 @@ class Puppet::Provider::Mikrotik_Api < Puppet::Provider
     #Puppet.debug("Params: #{params.inspect}")
     
     result = connection.get_reply("#{path}/set", *params)    # .id => ?.id ???
-    
-    Puppet.debug("Set Result: #{result}")        
-    # => [{"!done"=>nil, ".tag"=>"5"}]
-    # TODO will raise an exception on fail?
+    Puppet.debug("Set Result: #{result}")
+    result.each do |res|
+      if res.key?('!trap')
+        raise "Error while setting #{path}: #{res['message']}"
+      end
+    end
   end
   
   def self.add(path, params_hash)
@@ -64,11 +66,13 @@ class Puppet::Provider::Mikrotik_Api < Puppet::Provider
     params << params_hash.collect { |k,v| "=#{k}=#{v}" }
     #Puppet.debug("Params: #{params}")
     
-    result = connection.get_reply("#{path}/add", *params)
-    
+    result = connection.get_reply("#{path}/add", *params)    
     Puppet.debug("Add Result: #{result}")
-    # => [{"!done"=>nil, ".tag"=>"5"}]
-    # TODO will raise an exception on fail?
+    result.each do |res|
+      if res.key?('!trap')
+        raise "Error while adding #{path}: #{res['message']}"
+      end
+    end
   end
 
   def self.remove(path, params_hash)
@@ -78,11 +82,12 @@ class Puppet::Provider::Mikrotik_Api < Puppet::Provider
     params << params_hash.collect { |k,v| "=#{k}=#{v}" }
     
     result = connection.get_reply("#{path}/remove", *params)
-    #Puppet.debug("Params: #{params}")
-    
-    Puppet.debug("Remove Result: #{result}")    
-    # => [{"!done"=>nil, ".tag"=>"5"}]
-    # TODO will raise an exception on fail?
+    Puppet.debug("Remove Result: #{result}")  
+    result.each do |res|
+      if res.key?('!trap')
+        raise "Error while removing #{path}: #{res['message']}"
+      end
+    end
   end
 
   def initialize(value = {})
