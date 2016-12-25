@@ -150,8 +150,7 @@ class Puppet::Provider::Mikrotik_Api < Puppet::Provider
   def self.lookup_id(path, lookup)
     id_list = []
       
-    query_words = []
-    query_words << lookup.collect { |k,v| "?#{k}=#{v}" }
+    query_words = lookup.collect { |k,v| "?#{k}=#{v}" }
     
     objects = connection.get_reply("#{path}/getall", *query_words)      
     objects.each do |object| 

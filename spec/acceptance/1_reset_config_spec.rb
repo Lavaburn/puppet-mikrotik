@@ -35,9 +35,11 @@ describe 'reset configuration' do
         mikrotik_firewall_rule { 'Puppet Test 3':
           ensure   => 'absent',
         }
+        
         mikrotik_address_list { 'MT_TEST_LIST':
           ensure => 'absent',
-        }        
+        }    
+            
         mikrotik_ip_service { 'telnet':
           ensure => 'disabled',
         }
@@ -49,7 +51,8 @@ describe 'reset configuration' do
         }
         mikrotik_ip_service { 'ftp':
           port => 21,
-        }        
+        }  
+              
         mikrotik_snmp { 'snmp':
           ensure          => disabled,
           contact         => "jubanoc@rcswimax.com",
@@ -64,6 +67,19 @@ describe 'reset configuration' do
         }
         mikrotik_snmp_community { 'test_rw':
           ensure     => absent,
+        }
+        
+        mikrotik_logging_action { 'myRemote':
+          ensure => absent
+        }
+        mikrotik_logging_rule { 'info,!dhcp_myRemote':
+          ensure => absent,
+          topics => ['info','!dhcp'],
+          action => 'myRemote',
+        }
+          
+        mikrotik_radius_server { 'auth-backup':
+          ensure => absent,
         }
       EOS
       
