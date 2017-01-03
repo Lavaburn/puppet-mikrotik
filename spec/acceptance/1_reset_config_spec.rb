@@ -81,6 +81,75 @@ describe 'reset configuration' do
         mikrotik_radius_server { 'auth-backup':
           ensure => absent,
         }
+        
+        mikrotik_user_group { 'admin1':
+          ensure => absent,
+        }
+             
+        mikrotik_user_group { 'admin2':
+          ensure => absent,
+        }
+        
+        mikrotik_user_aaa { 'aaa':
+          use_radius     => false,
+          accounting     => false,
+          interim_update => '1m',
+          default_group  => 'read',
+          exclude_groups => []
+        }
+        
+        mikrotik_system { 'system':
+          identity      => 'mikrotik',
+          timezone      => 'Europe/Brussels',
+          ntp_enabled   => false,
+          ntp_primary   => '193.190.147.153',
+          ntp_secondary => '195.200.224.66',
+        }   
+          
+        mikrotik_ip_settings { 'ip':
+          rp_filter => 'no',
+        }
+        
+        mikrotik_tool_email { 'email':
+          server       => '127.0.0.1',
+          from_address => 'jubanoc@rcswimax.com',
+        }
+        
+        mikrotik_graph_interface { 'all':
+          ensure => absent,
+        }
+        
+        mikrotik_graph_resource { 'resource':
+          ensure => absent,
+        }
+        
+        mikrotik_graph_queue { 'all':
+          ensure => absent,
+        }
+          
+        mikrotik_bgp_instance { 'RCS':
+          ensure => absent,
+        }
+        
+        mikrotik_bgp_peer { 'dude1':
+          ensure => absent,
+        }
+        
+        mikrotik_ospf_interface { 'ether1':
+          ensure => absent,        
+        }
+        
+        mikrotik_ospf_network { '105.235.209.44/32':
+          ensure => absent,        
+        }
+          
+        mikrotik_ospf_area { 'BORDER3':
+          ensure => absent,        
+        }
+        
+        mikrotik_ospf_instance { 'RCS':
+          ensure => absent,        
+        }
       EOS
       
       set_site_pp_on_master(site_pp)

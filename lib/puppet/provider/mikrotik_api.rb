@@ -171,4 +171,19 @@ class Puppet::Provider::Mikrotik_Api < Puppet::Provider
   def getState
     @property_hash[:state]
   end  
+  
+  def self.convertStringToBool(str)
+    result = str == 'true'?true:false
+    result
+  end
+  
+  def self.convertBoolToYesNo(str)
+    result = str.to_s == 'true'?"yes":"no"
+    result
+  end
+  
+  def self.convertYesNoToBool(str)
+    result = str == 'yes'?true:false
+    result
+  end
 end
