@@ -150,6 +150,20 @@ describe 'reset configuration' do
         mikrotik_ospf_instance { 'RCS':
           ensure => absent,        
         }
+
+        mikrotik_ppp_aaa { 'aaa':
+          use_radius     => false,
+          accounting     => false,
+          interim_update => '1m',
+        }
+
+        mikrotik_ppp_profile { 'profile1':
+          ensure => absent,
+        }
+
+        mikrotik_ppp_profile { 'profile2':
+          ensure => absent,
+        }
       EOS
       
       set_site_pp_on_master(site_pp)
