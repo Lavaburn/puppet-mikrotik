@@ -151,6 +151,7 @@ describe 'reset configuration' do
 #          ensure => absent,        
 #        }
 #
+#        # ppp spec 
 #        mikrotik_ppp_aaa { 'aaa':
 #          use_radius     => false,
 #          accounting     => false,
@@ -164,7 +165,7 @@ describe 'reset configuration' do
 #        mikrotik_ppp_profile { 'profile2':
 #          ensure => absent,
 #        }
-#          
+#
 #        # interface_spec
 #        mikrotik_interface_vrrp { 'br0_vip':
 #          ensure => absent,        
@@ -205,11 +206,33 @@ describe 'reset configuration' do
 #        mikrotik_interface_list { 'interface_list_1':
 #          ensure => 'absent',
 #        }
-
+#
+#        # ip address spec
 #        mikrotik_ip_address { '192.168.201.1/24':
 #          ensure => absent,
 #        }
+#        
+#        mikrotik_ip_pool { 'SWIMMING':
+#          ensure => absent,
+#        }
+#  
+#        mikrotik_ip_pool { 'POOL2':
+#          ensure => absent,
+#        }
 #      
+#        mikrotik_dhcp_server_network { 'DHCPD_NET1':
+#          ensure => absent,
+#        }
+#      
+#        mikrotik_dhcp_server { 'DHCPD1':
+#          ensure => absent,
+#        }
+#  
+#        mikrotik_interface_vlan { 'VLAN_DHCP':
+#          ensure => absent,
+#        }
+#          
+#        # route spec
 #        mikrotik_ip_route { 'test_route1':
 #          ensure => absent,
 #        }
@@ -245,6 +268,14 @@ describe 'reset configuration' do
 #        mikrotik_routing_filter { 'test_filter3':
 #          ensure => absent,          
 #        }        
+#  
+#        # mpls spec
+#        mikrotik_mpls_ldp { 'ldp':
+#          ensure            => disabled,
+#          lsr_id            => '0.0.0.0',
+#          transport_address => '0.0.0.0',
+#          loop_detect       =>  false,
+#        }
       EOS
       
       set_site_pp_on_master(site_pp)

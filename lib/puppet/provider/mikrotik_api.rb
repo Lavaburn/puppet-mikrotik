@@ -165,10 +165,12 @@ class Puppet::Provider::Mikrotik_Api < Puppet::Provider
   
   # Different ensure options can be stored in "state"
   def setState(state)
-    @property_flush[:ensure] = state
+    @property_hash[:state] = state
   end  
   
   def getState
+    return :absent if @property_hash[:state].nil?
+    
     @property_hash[:state]
   end  
   
