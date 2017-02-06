@@ -17,12 +17,12 @@ Puppet::Type.type(:mikrotik_bgp_instance).provide(:mikrotik_api, :parent => Pupp
         :name                        => data['name'],
         :as                          => data['as'],
         :router_id                   => data['router-id'],
-        :redistribute_connected      => data['redistribute-connected'],
-        :redistribute_static         => data['redistribute-static'],
-        :redistribute_ospf           => data['redistribute-ospf'],
-        :redistribute_bgp            => data['redistribute-other-bgp'],
+        :redistribute_connected      => Puppet::Provider::Mikrotik_Api::convertYesNoToBool(data['redistribute-connected']),
+        :redistribute_static         => Puppet::Provider::Mikrotik_Api::convertYesNoToBool(data['redistribute-static']),
+        :redistribute_ospf           => Puppet::Provider::Mikrotik_Api::convertYesNoToBool(data['redistribute-ospf']),
+        :redistribute_bgp            => Puppet::Provider::Mikrotik_Api::convertYesNoToBool(data['redistribute-other-bgp']),
         :out_filter                  => data['out-filter'],
-        :client_to_client_reflection => data['client-to-client-reflection'],
+        :client_to_client_reflection => Puppet::Provider::Mikrotik_Api::convertYesNoToBool(data['client-to-client-reflection']),
         :routing_table               => data['routing-table']
       )
   end
