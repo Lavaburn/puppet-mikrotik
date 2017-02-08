@@ -39,12 +39,12 @@ Puppet::Type.type(:mikrotik_ip_service).provide(:mikrotik_api, :parent => Puppet
     
     params = {}
         
-    if resource[:ensure] == :disabled
+    if @property_hash[:state] == :disabled
       params["disabled"] = true
-    else
+    elsif @property_hash[:state] == :enabled
       params["disabled"] = false
     end
-        
+    
     params["port"] = resource[:port] if ! resource[:port].nil?   
     if ! resource[:addresses].nil?
       params["address"] = resource[:addresses].join(',')

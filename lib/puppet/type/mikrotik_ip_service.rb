@@ -2,7 +2,9 @@ Puppet::Type.newtype(:mikrotik_ip_service) do
   apply_to_device
 
   ensurable do
-    defaultto :enabled
+    defaultto :present
+
+    newvalue(:present)
     
     newvalue(:enabled) do
       provider.setState(:enabled)      
@@ -15,10 +17,19 @@ Puppet::Type.newtype(:mikrotik_ip_service) do
     def retrieve
       provider.getState
     end
-
-#    def insync?(is)
-#      return is == provider.getState
-#    end
+    
+    def insync?(is)
+      @should.each { |should| 
+        case should
+          when :present
+            return true
+          when :enabled                   
+            return (provider.getState == :enabled)
+          when :disabled                      
+            return (provider.getState == :disabled)       
+        end
+      }      
+    end
   end
 
   newparam(:name) do

@@ -12,30 +12,44 @@ Puppet::Type.type(:mikrotik_interface_vrrp).provide(:mikrotik_api, :parent => Pu
   end
   
   def self.interface(data)
-      new(
-        :ensure          => :present,
-        :name            => data['name'],
-        :mtu             => data['mtu'],
-        :arp             => data['arp'],
-        :arp_timeout     => data['arp-timeout'],
-        :interface       => data['interface'],
-        :vrid            => data['vrid'],
-        :priority        => data['priority'],
-        :interval        => data['interval'],
-        :preemption_mode => data['preemption-mode'],
-        :authentication  => data['authentication'],
-        :password        => data['password'],
-        :version         => data['version'],
-        :v3_protocol     => data['v3-protocol'],
-        :on_master       => data['on-master'],
-        :on_backup       => data['on-backup']
-      )
+    if data['disabled'] == "true"
+      state = :disabled
+    else
+      state = :enabled
+    end
+    
+    new(
+      :ensure          => :present,
+      :state           => state,
+      :name            => data['name'],
+      :mtu             => data['mtu'],
+      :arp             => data['arp'],
+      :arp_timeout     => data['arp-timeout'],
+      :interface       => data['interface'],
+      :vrid            => data['vrid'],
+      :priority        => data['priority'],
+      :interval        => data['interval'],
+      :preemption_mode => data['preemption-mode'],
+      :authentication  => data['authentication'],
+      :password        => data['password'],
+      :version         => data['version'],
+      :v3_protocol     => data['v3-protocol'],
+      :on_master       => data['on-master'],
+      :on_backup       => data['on-backup']
+    )
   end
 
   def flush
     Puppet.debug("Flushing VRRP Interface #{resource[:name]}")
       
     params = {}
+
+    if @property_hash[:state] == :disabled
+      params["disabled"] = 'yes'
+    elsif @property_hash[:state] == :enabled
+      params["disabled"] = 'no'
+    end
+    
     params["name"] = resource[:name]
     params["mtu"] = resource[:mtu] if ! resource[:mtu].nil?
     params["arp"] = resource[:arp] if ! resource[:arp].nil?

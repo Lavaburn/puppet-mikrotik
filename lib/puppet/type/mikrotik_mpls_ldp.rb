@@ -2,8 +2,10 @@ Puppet::Type.newtype(:mikrotik_mpls_ldp) do
   apply_to_device
 
   ensurable do
-    defaultto :disabled
-    
+    defaultto :present
+
+    newvalue(:present)
+        
     newvalue(:enabled) do
       provider.setState(:enabled)      
     end
@@ -14,6 +16,19 @@ Puppet::Type.newtype(:mikrotik_mpls_ldp) do
 
     def retrieve
       provider.getState
+    end
+    
+    def insync?(is)
+      @should.each { |should| 
+        case should
+          when :present
+            return true
+          when :enabled                   
+            return (provider.getState == :enabled)
+          when :disabled                      
+            return (provider.getState == :disabled)       
+        end
+      }      
     end
   end
   

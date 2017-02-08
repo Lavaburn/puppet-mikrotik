@@ -12,20 +12,34 @@ Puppet::Type.type(:mikrotik_interface_bridge).provide(:mikrotik_api, :parent => 
   end
   
   def self.interface(data)
-      new(
-        :ensure      => :present,
-        :name        => data['name'],
-        :mtu         => data['mtu'],
-        :arp         => data['arp'],
-        :arp_timeout => data['arp-timeout'],
-        :admin_mac   => data['admin-mac']
-      )
+    if data['disabled'] == "true"
+      state = :disabled
+    else
+      state = :enabled
+    end
+    
+    new(
+      :ensure      => :present,
+      :state       => state,
+      :name        => data['name'],
+      :mtu         => data['mtu'],
+      :arp         => data['arp'],
+      :arp_timeout => data['arp-timeout'],
+      :admin_mac   => data['admin-mac']
+    )
   end
 
   def flush
     Puppet.debug("Flushing Bridge #{resource[:name]}")
       
     params = {}
+
+    if @property_hash[:state] == :disabled
+      params["disabled"] = 'yes'
+    elsif @property_hash[:state] == :enabled
+      params["disabled"] = 'no'
+    end
+    
     params["name"] = resource[:name]
     params["mtu"] = resource[:mtu] if ! resource[:mtu].nil?
     params["arp"] = resource[:arp] if ! resource[:arp].nil?

@@ -143,6 +143,21 @@ describe '/interface' do
     it_behaves_like 'an idempotent device run'
   end
 
+  # Don't mess with future tests...
+  context "reset ethernet name" do
+    it 'should update master' do
+      site_pp = <<-EOS
+      mikrotik_interface_ethernet { 'ether1':      
+          alias => 'ether1',
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+  
   context "create interface list" do
     it 'should update master' do
       site_pp = <<-EOS
@@ -170,4 +185,64 @@ describe '/interface' do
   
     it_behaves_like 'an idempotent device run'
   end
+  
+  context "disable some interfaces" do
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_interface_bridge { 'br0':
+          ensure => disabled
+        }
+  
+        mikrotik_interface_eoip { 'ip_tnl_01':
+          ensure => disabled
+        }
+        
+        mikrotik_interface_vrrp { 'br0_vip':  
+          ensure => disabled
+        }
+        
+        mikrotik_interface_vlan { 'VLAN_4001':      
+          ensure => disabled
+        }
+        
+        mikrotik_interface_bond { 'ip_tnl_bond':   
+          ensure => disabled
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end  
+  
+  context "enable some interfaces" do
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_interface_bridge { 'br0':
+          ensure => enabled
+        }
+  
+        mikrotik_interface_eoip { 'ip_tnl_01':
+          ensure => enabled
+        }
+        
+        mikrotik_interface_vrrp { 'br0_vip':  
+          ensure => enabled
+        }
+        
+        mikrotik_interface_vlan { 'VLAN_4001':      
+          ensure => enabled
+        }
+        
+        mikrotik_interface_bond { 'ip_tnl_bond':   
+          ensure => enabled
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end  
 end

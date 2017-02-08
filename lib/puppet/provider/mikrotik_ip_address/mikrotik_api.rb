@@ -12,17 +12,31 @@ Puppet::Type.type(:mikrotik_ip_address).provide(:mikrotik_api, :parent => Puppet
   end
   
   def self.ipAddress(data)
-      new(
-        :ensure     => :present,
-        :name       => data['address'],
-        :interface  => data['interface']
-      )
+    if data['disabled'] == "true"
+      state = :disabled
+    else
+      state = :enabled
+    end
+    
+    new(
+      :ensure     => :present,
+      :state      => state,
+      :name       => data['address'],
+      :interface  => data['interface']
+    )
   end
 
   def flush
     Puppet.debug("Flushing IP Address #{resource[:name]}")
       
     params = {}
+
+    if @property_hash[:state] == :disabled
+      params["disabled"] = 'yes'
+    elsif @property_hash[:state] == :enabled
+      params["disabled"] = 'no'
+    end
+    
     params["address"]   = resource[:name]
     params["interface"] = resource[:interface]
 

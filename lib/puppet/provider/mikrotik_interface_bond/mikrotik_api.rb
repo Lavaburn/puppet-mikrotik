@@ -12,8 +12,15 @@ Puppet::Type.type(:mikrotik_interface_bond).provide(:mikrotik_api, :parent => Pu
   end
   
   def self.interface(data)
+    if data['disabled'] == "true"
+      state = :disabled
+    else
+      state = :enabled
+    end
+    
     new(
       :ensure               => :present,
+      :state                => state,
       :name                 => data['name'],
       :mtu                  => data['mtu'],
       :arp                  => data['arp'],
@@ -30,6 +37,13 @@ Puppet::Type.type(:mikrotik_interface_bond).provide(:mikrotik_api, :parent => Pu
     Puppet.debug("Flushing Bonded Interface #{resource[:name]}")
       
     params = {}
+
+    if @property_hash[:state] == :disabled
+      params["disabled"] = 'yes'
+    elsif @property_hash[:state] == :enabled
+      params["disabled"] = 'no'
+    end
+    
     params["name"] = resource[:name]
     params["mtu"] = resource[:mtu] if ! resource[:mtu].nil?
     params["arp"] = resource[:arp] if ! resource[:arp].nil?

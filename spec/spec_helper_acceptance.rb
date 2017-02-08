@@ -27,17 +27,27 @@ RSpec.configure do |c|
       on master, 'sed -e "s/2g/1g/g" /tmp/puppetserver > /etc/default/puppetserver'
       
       autosign_conf = ""
+      # TODO ? agents.each { |agent| autosign_conf << "#{agent[:name]}\n" }
       autosign_file = '/etc/puppetlabs/puppet/autosign.conf'
       @testnodes.each { |node| autosign_conf << "#{node[:name]}\n" }
       
       create_remote_file(master, autosign_file, autosign_conf)
       on master, "chown puppet #{autosign_file}"
       
-      on master, 'service puppetserver start'
+      on master, 'service puppetserver start'  
+        
+      # TODO ? # Pluginsync requires 1 run on master?
+      # TODO ? site_pp = '/etc/puppetlabs/code/environments/production/manifests/site.pp'
+      # TODO ? create_remote_file(master, site_pp, 'node default {}')
+      # TODO ? on master, "chown puppet #{site_pp}"
+      # TODO ? on master, "puppet agent -t"
     end
   
     # Agents
-    agents.each do |agent|        
+    agents.each do |agent|      
+      # TODO ? # Pluginsync requires 1 run on agent?
+      # TODO ? on master, "puppet agent -t"
+        
       # Set device.conf
       device_conf = ""
       @testnodes.each { |node| device_conf << "[#{node[:name]}]\n  type mikrotik\n  url api://admin:wimaxrouter@#{node[:ip]}\n" }
@@ -78,7 +88,7 @@ end
 
 def create_site_pp(site_pp)
   result = ""
-  @testnodes.each { |node| result << "node '#{node[:name]}' {\n#{site_pp}\n}\n" }
+  @testnodes.each { |node| result << "node default {\n\n}\n\nnode '#{node[:name]}' {\n#{site_pp}\n}\n" }
   
   result
 end

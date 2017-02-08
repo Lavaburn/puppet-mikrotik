@@ -21,8 +21,15 @@ Puppet::Type.type(:mikrotik_ip_route_rule).provide(:mikrotik_api, :parent => Pup
   
   def self.ipRule(data)
     if data['comment'] != nil
+      if data['disabled'] == "true"
+        state = :disabled
+      else
+        state = :enabled
+      end
+      
       new(
         :ensure       => :present,
+        :state        => state,
         :name         => data['comment'],
         :src_address  => data['src-address'],
         :dst_address  => data['dst-address'],
@@ -38,8 +45,14 @@ Puppet::Type.type(:mikrotik_ip_route_rule).provide(:mikrotik_api, :parent => Pup
     Puppet.debug("Flushing IP Route Rule #{resource[:name]}")
       
     params = {}
-    params["comment"] = resource[:name]
 
+    if @property_hash[:state] == :disabled
+      params["disabled"] = 'yes'
+    elsif @property_hash[:state] == :enabled
+      params["disabled"] = 'no'
+    end
+    
+    params["comment"] = resource[:name]
     params["src-address"] = resource[:src_address] if !resource[:src_address].nil?
     params["dst-address"] = resource[:dst_address] if !resource[:dst_address].nil?
     params["routing-mark"] = resource[:routing_mark] if !resource[:routing_mark].nil?

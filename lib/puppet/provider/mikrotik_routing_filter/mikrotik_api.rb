@@ -23,8 +23,15 @@ Puppet::Type.type(:mikrotik_routing_filter).provide(:mikrotik_api, :parent => Pu
     if data['comment'] != nil
       #Puppet.debug("Routing filter: #{data.inspect}")
       
+      if data['disabled'] == "true"
+        state = :disabled
+      else
+        state = :enabled
+      end
+      
       new(
         :ensure                 => :present,
+        :state                  => state,
         :name                   => data['comment'],
         :chain                  => data['chain'],
         :prefix                 => data['prefix'],
@@ -85,13 +92,20 @@ Puppet::Type.type(:mikrotik_routing_filter).provide(:mikrotik_api, :parent => Pu
   def flush
     Puppet.debug("Flushing routing filter #{resource[:name]}")
 
-    if @property_flush[:ensure] == :present
+    unless @property_flush[:ensure] == :absent
       if resource[:chain].nil?
         raise "Chain is a required parameter."
       end
     end
 
-    params = {}
+    params = {}      
+
+    if @property_hash[:state] == :disabled
+      params["disabled"] = true
+    elsif @property_hash[:state] == :enabled
+      params["disabled"] = false
+    end
+      
     params["comment"] = resource[:name]
     params["chain"] = resource[:chain]    
     params["prefix"] = resource[:prefix] if !resource[:prefix].nil?

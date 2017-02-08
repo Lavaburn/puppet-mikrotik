@@ -21,8 +21,15 @@ Puppet::Type.type(:mikrotik_ip_route).provide(:mikrotik_api, :parent => Puppet::
   
   def self.ipRoute(data)
     if data['comment'] != nil
+      if data['disabled'] == "true"
+        state = :disabled
+      else
+        state = :enabled
+      end
+      
       new(
         :ensure               => :present,
+        :state                => state,
         :name                 => data['comment'],
         :dst_address          => data['dst-address'], 
         :gateway              => data['gateway'],
@@ -49,6 +56,13 @@ Puppet::Type.type(:mikrotik_ip_route).provide(:mikrotik_api, :parent => Puppet::
     Puppet.debug("Flushing IP Route #{resource[:name]}")
       
     params = {}
+
+    if @property_hash[:state] == :disabled
+      params["disabled"] = 'yes'
+    elsif @property_hash[:state] == :enabled
+      params["disabled"] = 'no'
+    end
+    
     params["comment"] = resource[:name]
     params["dst-address"] = resource[:dst_address]
     params["gateway"] = resource[:gateway] if !resource[:gateway].nil?

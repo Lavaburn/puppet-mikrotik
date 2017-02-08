@@ -8,8 +8,10 @@ Puppet::Type.newtype(:mikrotik_snmp) do
   end
   
   ensurable do    
+    defaultto :present
+
     newvalue(:present)
-    
+        
     newvalue(:enabled) do
       provider.setState(:enabled)      
     end

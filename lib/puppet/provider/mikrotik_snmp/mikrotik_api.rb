@@ -7,10 +7,7 @@ Puppet::Type.type(:mikrotik_snmp).provide(:mikrotik_api, :parent => Puppet::Prov
 
   def self.instances      
     snmp = Puppet::Provider::Mikrotik_Api::get_all("/snmp")  
-    Puppet.debug("/snmp: #{snmp.inspect}")  
     instances = snmp.collect { |data| snmpSettings(data) }
-    Puppet.debug("instances: #{instances}")
-
     instances
   end
   
@@ -42,13 +39,13 @@ Puppet::Type.type(:mikrotik_snmp).provide(:mikrotik_api, :parent => Puppet::Prov
     end
 
     update = {}
-    if resource[:ensure] != :present
-      if resource[:ensure] == :disabled
-        update["enabled"] = false
-      else
-        update["enabled"] = true
-      end
-    end    
+      
+    if @property_hash[:state] == :disabled
+      update["enabled"] = false
+    elsif @property_hash[:state] == :enabled
+      update["enabled"] = true
+    end 
+    
     update["contact"] = resource[:contact] if ! resource[:contact].nil?
     update["location"] = resource[:location] if ! resource[:location].nil?
     update["trap-version"] = resource[:trap_version] if ! resource[:trap_version].nil?

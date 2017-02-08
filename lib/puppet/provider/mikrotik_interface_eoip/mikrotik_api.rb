@@ -12,29 +12,43 @@ Puppet::Type.type(:mikrotik_interface_eoip).provide(:mikrotik_api, :parent => Pu
   end
   
   def self.interface(data)
-      new(
-        :ensure          => :present,
-        :name            => data['name'],
-        :mtu             => data['mtu'],
-        :admin_mac       => data['admin-mac'],
-        :arp             => data['arp'],
-        :arp_timeout     => data['arp-timeout'],
-        :local_address   => data['local-address'],
-        :remote_address  => data['remote-address'],
-        :tunnel_id       => data['tunnel-id'],
-        :ipsec_secret    => data['ipsec-secret'],
-        :keepalive       => data['keepalive'],
-        :dscp            => data['dscp'],
-        :dont_fragment   => data['dont-fragment'],
-        :clamp_tcp_mss   => data['clamp-tcp-mss'],
-        :allow_fast_path => data['allow-fast-path']
-      )
+    if data['disabled'] == "true"
+      state = :disabled
+    else
+      state = :enabled
+    end
+    
+    new(
+      :ensure          => :present,
+      :state           => state,
+      :name            => data['name'],
+      :mtu             => data['mtu'],
+      :admin_mac       => data['admin-mac'],
+      :arp             => data['arp'],
+      :arp_timeout     => data['arp-timeout'],
+      :local_address   => data['local-address'],
+      :remote_address  => data['remote-address'],
+      :tunnel_id       => data['tunnel-id'],
+      :ipsec_secret    => data['ipsec-secret'],
+      :keepalive       => data['keepalive'],
+      :dscp            => data['dscp'],
+      :dont_fragment   => data['dont-fragment'],
+      :clamp_tcp_mss   => data['clamp-tcp-mss'],
+      :allow_fast_path => data['allow-fast-path']
+    )
   end
 
   def flush
     Puppet.debug("Flushing EoIP Interface #{resource[:name]}")
       
     params = {}
+
+    if @property_hash[:state] == :disabled
+      params["disabled"] = 'yes'
+    elsif @property_hash[:state] == :enabled
+      params["disabled"] = 'no'
+    end
+    
     params["name"] = resource[:name]
     params["mtu"] = resource[:mtu] if ! resource[:mtu].nil?
     params["admin-mac"] = resource[:admin_mac] if ! resource[:admin_mac].nil?

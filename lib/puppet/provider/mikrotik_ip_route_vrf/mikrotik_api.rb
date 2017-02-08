@@ -21,8 +21,15 @@ Puppet::Type.type(:mikrotik_ip_route_vrf).provide(:mikrotik_api, :parent => Pupp
   
   def self.vrf(data)
     if data['routing-mark'] != nil
+      if data['disabled'] == "true"
+        state = :disabled
+      else
+        state = :enabled
+      end
+      
       new(
         :ensure               => :present,
+        :state                => state,
         :name                 => data['routing-mark'],
         :interfaces           => data['interfaces'].nil? ? nil : data['interfaces'].split(','),
         :route_distinguisher  => data['route-distinguisher'],
@@ -36,6 +43,13 @@ Puppet::Type.type(:mikrotik_ip_route_vrf).provide(:mikrotik_api, :parent => Pupp
     Puppet.debug("Flushing IP Route VRF #{resource[:name]}")
       
     params = {}
+
+    if @property_hash[:state] == :disabled
+      params["disabled"] = 'yes'
+    elsif @property_hash[:state] == :enabled
+      params["disabled"] = 'no'
+    end
+    
     params["routing-mark"] = resource[:name]
     params["interfaces"] = resource[:interfaces].join(',') if !resource[:interfaces].nil?
     params["route-distinguisher"] = resource[:route_distinguisher] if !resource[:route_distinguisher].nil?

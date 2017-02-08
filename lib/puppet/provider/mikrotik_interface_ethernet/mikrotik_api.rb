@@ -12,22 +12,38 @@ Puppet::Type.type(:mikrotik_interface_ethernet).provide(:mikrotik_api, :parent =
   end
   
   def self.interface(data)
-      new(
-        :ensure           => :present,
-        :name             => data['default-name'],
-        :alias            => data['name'],
-        :mtu              => data['mtu'],
-        :arp              => data['arp'],
-        :arp_timeout      => data['arp_timeout'],
-        :auto_negotiation => data['auto_negotiation'],
-        :advertise        => data['advertise'].split(',')
-      )
+    if data['disabled'] == "true"
+      state = :disabled
+    else
+      state = :enabled
+    end
+    
+    new(
+      :ensure           => :present,
+      :state            => state,
+      :name             => data['default-name'],
+      :alias            => data['name'],
+      :mtu              => data['mtu'],
+      :arp              => data['arp'],
+      :arp_timeout      => data['arp_timeout'],
+      :auto_negotiation => data['auto_negotiation'],
+      :advertise        => data['advertise'].split(',')
+    )
   end
 
   def flush
     Puppet.debug("Flushing Ethernet Interface #{resource[:name]}")
       
     params = {}
+
+    if @property_hash[:state] == :disabled
+    #  params["disabled"] = 'yes'
+      Puppet.debug("DISABLE Ethernet Interface #{resource[:name]}")
+    elsif @property_hash[:state] == :enabled
+    #  params["disabled"] = 'no'
+      Puppet.debug("ENABLE Ethernet Interface #{resource[:name]}")
+    end
+    
     params["name"] = resource[:alias] if ! resource[:alias].nil?
     params["mtu"] = resource[:mtu] if ! resource[:mtu].nil?
     params["arp"] = resource[:arp] if ! resource[:arp].nil?

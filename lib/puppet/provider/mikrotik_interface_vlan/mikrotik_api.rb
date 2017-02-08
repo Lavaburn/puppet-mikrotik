@@ -12,22 +12,36 @@ Puppet::Type.type(:mikrotik_interface_vlan).provide(:mikrotik_api, :parent => Pu
   end
   
   def self.interface(data)
-      new(
-        :ensure          => :present,
-        :name            => data['name'],
-        :mtu             => data['mtu'],
-        :arp             => data['arp'],
-        :arp_timeout     => data['arp-timeout'],
-        :vlan_id         => data['vlan-id'],
-        :interface       => data['interface'],
-        :use_service_tag => data['use-service-tag']
-      )
+    if data['disabled'] == "true"
+      state = :disabled
+    else
+      state = :enabled
+    end
+    
+    new(
+      :ensure          => :present,
+      :state           => state,
+      :name            => data['name'],
+      :mtu             => data['mtu'],
+      :arp             => data['arp'],
+      :arp_timeout     => data['arp-timeout'],
+      :vlan_id         => data['vlan-id'],
+      :interface       => data['interface'],
+      :use_service_tag => data['use-service-tag']
+    )
   end
 
   def flush
     Puppet.debug("Flushing VLAN Interface #{resource[:name]}")
       
     params = {}
+
+    if @property_hash[:state] == :disabled
+      params["disabled"] = 'yes'
+    elsif @property_hash[:state] == :enabled
+      params["disabled"] = 'no'
+    end
+    
     params["name"] = resource[:name]
     params["mtu"] = resource[:mtu] if ! resource[:mtu].nil?
     params["arp"] = resource[:arp] if ! resource[:arp].nil?

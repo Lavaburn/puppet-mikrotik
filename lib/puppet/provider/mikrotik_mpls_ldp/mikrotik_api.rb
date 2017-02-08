@@ -49,9 +49,9 @@ Puppet::Type.type(:mikrotik_mpls_ldp).provide(:mikrotik_api, :parent => Puppet::
     
     update = {}
 
-    if resource[:ensure] == :disabled
+    if @property_hash[:state] == :disabled
       update["enabled"] = 'no'
-    else
+    elsif @property_hash[:state] == :enabled
       update["enabled"] = 'yes'
     end
     

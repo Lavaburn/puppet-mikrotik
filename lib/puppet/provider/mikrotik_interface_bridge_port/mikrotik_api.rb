@@ -12,17 +12,31 @@ Puppet::Type.type(:mikrotik_interface_bridge_port).provide(:mikrotik_api, :paren
   end
   
   def self.interface(data)
-      new(
-        :ensure => :present,
-        :name   => data['interface'],
-        :bridge => data['bridge']
-      )
+    if data['disabled'] == "true"
+      state = :disabled
+    else
+      state = :enabled
+    end
+    
+    new(
+      :ensure => :present,
+      :state  => state,
+      :name   => data['interface'],
+      :bridge => data['bridge']
+    )
   end
 
   def flush
     Puppet.debug("Flushing Bridge Port #{resource[:name]}")
       
     params = {}
+
+    if @property_hash[:state] == :disabled
+      params["disabled"] = 'yes'
+    elsif @property_hash[:state] == :enabled
+      params["disabled"] = 'no'
+    end
+    
     params["interface"] = resource[:name]
     params["bridge"] = resource[:bridge]
 
