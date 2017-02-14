@@ -98,6 +98,7 @@ describe 'reset configuration' do
           exclude_groups => []
         }
         
+        # system spec
         mikrotik_system { 'system':
           identity      => 'mikrotik',
           timezone      => 'Europe/Brussels',
@@ -105,7 +106,16 @@ describe 'reset configuration' do
           ntp_primary   => '193.190.147.153',
           ntp_secondary => '195.200.224.66',
         }   
-          
+         
+        mikrotik_script { 'script1': 
+          ensure => absent,
+        }
+      
+        mikrotik_schedule { 'daily_run_script1': 
+          ensure => absent,
+        }
+         
+        #
         mikrotik_ip_settings { 'ip':
           rp_filter => 'no',
         }

@@ -10,9 +10,11 @@ class Puppet::Util::NetworkDevice::Transport::Mikrotik < Puppet::Util::NetworkDe
     require 'mtik'
     
     url_object = URI(url)
-    
-    # TODO SSH Provider ? => url_object.scheme
-    # TODO  #{url_object.username} #{url_object.password} = NULL !!!
-    @connection = MTik::Connection.new :host => url_object.host, :user => 'admin', :pass => 'wimaxrouter', :conn_timeout => 10
+
+    if (url_object.scheme == 'api')
+      @connection = MTik::Connection.new :host => url_object.host, :user => url_object.user, :pass => url_object.password, :conn_timeout => 10
+    else 
+      raise "The Mikrotik module currently only support API access. Use api:// in URL."  
+    end    
   end
 end

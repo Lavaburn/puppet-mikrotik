@@ -40,4 +40,73 @@ describe '/system' do
   
     it_behaves_like 'a faulty device run'
   end
+
+  context "script with schedule" do
+    it 'should update master' do
+      site_pp = <<-EOS    
+        mikrotik_script { 'script1': 
+          policies => ['read'],
+          source   => '/log info message="Hello World!"',   
+        }
+      
+        mikrotik_schedule { 'daily_run_script1': 
+          interval => '1h',
+          policies => ['read'],
+          on_event => 'script1',
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+  
+  context "update script and schedule" do
+    it 'should update master' do
+      site_pp = <<-EOS    
+        mikrotik_script { 'script1': 
+          policies => ['write'],
+          source   => '/log info message="Hello World 2 !"',   
+        }
+      
+        mikrotik_schedule { 'daily_run_script1': 
+          interval => '1d',
+          policies => ['read', 'write'],
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+  
+  context "disable schedule" do
+    it 'should update master' do
+      site_pp = <<-EOS    
+        mikrotik_schedule { 'daily_run_script1': 
+          ensure => disabled
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+
+  context "enable schedule" do
+    it 'should update master' do
+      site_pp = <<-EOS    
+        mikrotik_schedule { 'daily_run_script1': 
+          ensure => enabled
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
 end
