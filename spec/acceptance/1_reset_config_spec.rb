@@ -1,7 +1,7 @@
 require 'spec_helper_acceptance'
 
 describe 'reset configuration' do
-  #before { skip("Skipping this test for now") }
+  before { skip("Skipping this test for now") }
   
   include_context 'testnodes defined'
   
@@ -25,7 +25,7 @@ describe 'reset configuration' do
           servers               => ['8.8.8.8','8.8.4.4'],
           allow_remote_requests => true,
         }
-        
+
         mikrotik_firewall_rule { 'Puppet Test 1':
           ensure   => 'absent',
         }
@@ -35,7 +35,7 @@ describe 'reset configuration' do
         mikrotik_firewall_rule { 'Puppet Test 3':
           ensure   => 'absent',
         }
-        
+
         mikrotik_address_list { 'MT_TEST_LIST':
           ensure => 'absent',
         }    
@@ -82,6 +82,10 @@ describe 'reset configuration' do
           ensure => absent,
         }
         
+        mikrotik_user { 'testuser1':
+          ensure => absent,
+        }
+        
         mikrotik_user_group { 'admin1':
           ensure => absent,
         }
@@ -96,6 +100,11 @@ describe 'reset configuration' do
           interim_update => '1m',
           default_group  => 'read',
           exclude_groups => []
+        }
+
+        # TODO
+        mikrotik_user_sshkey { 'testuser1':
+          ensure => absent,
         }
         
         # system spec
@@ -216,7 +225,23 @@ describe 'reset configuration' do
         mikrotik_interface_list { 'interface_list_1':
           ensure => 'absent',
         }
+        
+        mikrotik_ppp_server { 'pptp':
+          ensure => 'disabled',
+        }
+              
+        mikrotik_ppp_server { 'l2tp':
+          ensure => 'disabled',
+        }
 
+        mikrotik_ppp_secret  { 'ppp_user1':
+          ensure => 'absent',
+        }
+      
+        mikrotik_ppp_secret  { 'ppp_user2':
+          ensure => 'absent',
+        }
+        
         # ip address spec
         mikrotik_ip_address { '192.168.201.1/24':
           ensure => absent,

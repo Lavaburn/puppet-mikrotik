@@ -5,13 +5,13 @@ Puppet::Type.type(:mikrotik_user_sshkey).provide(:mikrotik_api, :parent => Puppe
   
   mk_resource_methods
 
-  def self.instances    
+  def self.instances
     ssh_keys = Puppet::Provider::Mikrotik_Api::get_all("/user/ssh-keys")
-    instances = ssh_keys.collect { |ssh_key| sshKey(ssh_key) }    
+    instances = ssh_keys.collect { |ssh_key| sshKey(ssh_key) }
     instances
   end
-  
-  def self.sshKey(data)    
+
+  def self.sshKey(data)
     new(
       :ensure => :present,
       :name   => data['name']
@@ -20,14 +20,14 @@ Puppet::Type.type(:mikrotik_user_sshkey).provide(:mikrotik_api, :parent => Puppe
 
   def flush
     Puppet.debug("Flushing User SSH Key #{resource[:name]}")
-      
+
     params = {}
     params["user"] = resource[:name]
     params["public-key-file"] = 'TODO'
 
     lookup = {}
     lookup["name"] = resource[:name]
-    
+
     Puppet.debug("Params: #{params.inspect} - Lookup: #{lookup.inspect}")
 
     # TODO - transfer file and import...
