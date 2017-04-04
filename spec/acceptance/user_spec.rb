@@ -14,7 +14,7 @@ describe '/user' do
              
         mikrotik_user_group { 'admin2':
           policy => ['read', 'ssh', 'winbox']
-        }      
+        }
       EOS
       
       set_site_pp_on_master(site_pp)
@@ -69,5 +69,57 @@ describe '/user' do
     end
   
     it_behaves_like 'a faulty device run'
+  end
+  
+  context "create user" do
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_user { 'testuser1':
+          password  => 'password',
+          group     => 'admin1',
+          addresses => ['192.168.0.0/24'],
+        }
+
+      # TODO
+#        mikrotik_user_sshkey { 'testuser1':
+#          public_key => 'TODO',
+#        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+
+  context "update user" do
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_user { 'testuser1':
+          password  => 'password2',
+          group     => 'admin2',
+          addresses => ['192.168.0.0/24', '192.168.1.0/24'],
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+
+  context "disable user" do
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_user { 'testuser1':
+          ensure    => 'disabled',
+          addresses => ['192.168.1.0/24'],
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
   end
 end

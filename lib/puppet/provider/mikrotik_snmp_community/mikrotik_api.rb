@@ -14,13 +14,15 @@ Puppet::Type.type(:mikrotik_snmp_community).provide(:mikrotik_api, :parent => Pu
   end
   
   def self.snmpCommunity(data)
-      new(
-        :ensure       => :present,
-        :name         => data['name'],
-        :read_access  => data['read-access'],
-        :write_access => data['write-access'],
-        :addresses    => data['addresses'].split(',')
-      )
+    addresses = data['addresses'].nil? ? nil : data['addresses'].split(',')
+    
+    new(
+      :ensure       => :present,
+      :name         => data['name'],
+      :read_access  => data['read-access'],
+      :write_access => data['write-access'],
+      :addresses    => addresses
+    )
   end
 
   def flush
