@@ -1,6 +1,4 @@
 Puppet::Type.newtype(:mikrotik_firewall_rule) do
-  apply_to_device
-
   ensurable do
     newvalue(:present) do
       provider.create

@@ -1,6 +1,4 @@
-Puppet::Type.newtype(:mikrotik_address_list) do
-  apply_to_device
-
+Puppet::Type.newtype(:mikrotik_address_list) do  
   ensurable do
     defaultvalues
     defaultto :present

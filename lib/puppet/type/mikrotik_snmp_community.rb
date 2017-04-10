@@ -1,6 +1,4 @@
 Puppet::Type.newtype(:mikrotik_snmp_community) do
-  apply_to_device
-
   ensurable
   
   newparam(:name) do

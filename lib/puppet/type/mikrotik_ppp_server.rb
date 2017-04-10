@@ -1,6 +1,4 @@
 Puppet::Type.newtype(:mikrotik_ppp_server) do
-  apply_to_device
-
   ensurable do
     newvalue(:present)
 

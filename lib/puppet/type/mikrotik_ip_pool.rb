@@ -1,6 +1,4 @@
 Puppet::Type.newtype(:mikrotik_ip_pool) do
-  apply_to_device
-
   ensurable do
     defaultvalues
     defaultto :present

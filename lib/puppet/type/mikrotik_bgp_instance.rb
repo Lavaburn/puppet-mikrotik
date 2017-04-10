@@ -1,6 +1,4 @@
 Puppet::Type.newtype(:mikrotik_bgp_instance) do
-  apply_to_device
-
   ensurable do
     defaultvalues
     defaultto :present

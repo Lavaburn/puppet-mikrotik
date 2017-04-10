@@ -1,6 +1,4 @@
 Puppet::Type.newtype(:mikrotik_tool_email) do
-  apply_to_device
-
   # Only 1 set of settings that is always enabled. NOT ensurable 
   
   newparam(:name) do

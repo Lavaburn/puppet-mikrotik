@@ -1,6 +1,4 @@
 Puppet::Type.newtype(:mikrotik_interface_vrrp) do
-  apply_to_device
-
   ensurable do
     defaultto :present
     

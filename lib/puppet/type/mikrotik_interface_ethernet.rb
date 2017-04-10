@@ -1,6 +1,4 @@
 Puppet::Type.newtype(:mikrotik_interface_ethernet) do
-  apply_to_device
-
   ensurable do
     defaultto :present
     

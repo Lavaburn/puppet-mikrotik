@@ -1,6 +1,4 @@
 Puppet::Type.newtype(:mikrotik_radius_server) do
-  apply_to_device
-
   ensurable
   # TODO -ENABLED-
   

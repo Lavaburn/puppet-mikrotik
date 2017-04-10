@@ -1,6 +1,4 @@
 Puppet::Type.newtype(:mikrotik_dhcp_server_network) do
-  apply_to_device
-
   ensurable do
     defaultvalues
     defaultto :present

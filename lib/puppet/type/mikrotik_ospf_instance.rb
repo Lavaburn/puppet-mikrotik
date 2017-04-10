@@ -1,6 +1,4 @@
 Puppet::Type.newtype(:mikrotik_ospf_instance) do
-  apply_to_device
-
   ensurable do
     defaultvalues
     defaultto :present

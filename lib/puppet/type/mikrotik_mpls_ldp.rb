@@ -1,6 +1,4 @@
 Puppet::Type.newtype(:mikrotik_mpls_ldp) do
-  apply_to_device
-
   ensurable do
     defaultto :present
 

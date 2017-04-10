@@ -1,6 +1,4 @@
 Puppet::Type.newtype(:mikrotik_snmp) do
-  apply_to_device
-
   # Only 1 set of settings.
   newparam(:name) do
     desc 'Name should be -snmp-'

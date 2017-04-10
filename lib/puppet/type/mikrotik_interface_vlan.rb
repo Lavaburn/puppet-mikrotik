@@ -1,6 +1,4 @@
 Puppet::Type.newtype(:mikrotik_interface_vlan) do
-  apply_to_device
-
   ensurable do
     defaultto :present
     

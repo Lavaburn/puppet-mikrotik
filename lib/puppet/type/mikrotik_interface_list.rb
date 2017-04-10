@@ -1,6 +1,4 @@
 Puppet::Type.newtype(:mikrotik_interface_list) do
-  apply_to_device
-
   ensurable do
     defaultvalues
     defaultto :present

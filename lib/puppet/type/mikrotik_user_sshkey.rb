@@ -1,6 +1,4 @@
 Puppet::Type.newtype(:mikrotik_user_sshkey) do
-  apply_to_device
-  
   ensurable
 
   newparam(:user) do
