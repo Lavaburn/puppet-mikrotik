@@ -1,4 +1,6 @@
 Puppet::Type.newtype(:mikrotik_ospf_interface) do
+  apply_to_all
+  
   ensurable do
     defaultvalues
     defaultto :present

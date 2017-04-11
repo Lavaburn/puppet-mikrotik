@@ -39,6 +39,22 @@ describe '/snmp' do
   
     it_behaves_like 'an idempotent device run'
   end
+  
+  context "snmp community - disable all permissions" do
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_snmp_community { 'test_ro':
+          read_access  => false,
+          write_access => false,
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+  
 
   context "snmp update community" do
     it 'should update master' do

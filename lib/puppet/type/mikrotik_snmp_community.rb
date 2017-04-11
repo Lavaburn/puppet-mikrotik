@@ -1,4 +1,6 @@
 Puppet::Type.newtype(:mikrotik_snmp_community) do
+  apply_to_all
+  
   ensurable
   
   newparam(:name) do

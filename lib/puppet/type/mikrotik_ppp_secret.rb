@@ -1,4 +1,6 @@
 Puppet::Type.newtype(:mikrotik_ppp_secret) do
+  apply_to_all
+  
   ensurable do    
     newvalue(:present) do
       provider.create  

@@ -30,8 +30,8 @@ Puppet::Type.type(:mikrotik_snmp_community).provide(:mikrotik_api, :parent => Pu
       
     params = {}
     params["name"] = resource[:name]
-    params["read-access"] = resource[:read_access]?"yes":"no" if ! resource[:read_access].nil?
-    params["write-access"] = resource[:write_access]?"yes":"no" if ! resource[:write_access].nil?
+    params["read-access"] = resource[:read_access] if ! resource[:read_access].nil?
+    params["write-access"] = resource[:write_access] if ! resource[:write_access].nil?
     params["addresses"] = resource[:addresses].join(',') if ! resource[:addresses].nil?
 
     lookup = {}

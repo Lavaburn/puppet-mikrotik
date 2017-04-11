@@ -1,4 +1,6 @@
 Puppet::Type.newtype(:mikrotik_routing_filter) do
+  apply_to_all
+  
   ensurable do
     defaultto :present
     

@@ -1,4 +1,6 @@
 Puppet::Type.newtype(:mikrotik_logging_rule) do
+  apply_to_all
+  
   ensurable
   
   newparam(:name) do

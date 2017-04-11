@@ -1,4 +1,6 @@
 Puppet::Type.newtype(:mikrotik_ip_address) do
+  apply_to_all
+  
   ensurable do
     defaultto :present
     

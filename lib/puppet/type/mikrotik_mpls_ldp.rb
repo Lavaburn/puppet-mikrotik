@@ -1,4 +1,6 @@
 Puppet::Type.newtype(:mikrotik_mpls_ldp) do
+  apply_to_all
+  
   ensurable do
     defaultto :present
 

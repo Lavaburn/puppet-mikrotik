@@ -41,6 +41,11 @@ RSpec.configure do |c|
       # TODO ? create_remote_file(master, site_pp, 'node default {}')
       # TODO ? on master, "chown puppet #{site_pp}"
       # TODO ? on master, "puppet agent -t"
+  
+      # First time, install mtik gem on all hosts
+      hosts.each do |host|
+        on host, '/opt/puppetlabs/puppet/bin/gem install mtik'
+      end
     end
   
     # Agents

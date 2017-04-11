@@ -1,4 +1,6 @@
 Puppet::Type.newtype(:mikrotik_system) do
+  apply_to_all
+  
   # Only 1 set of settings that is always enabled. NOT ensurable 
   
   newparam(:name) do

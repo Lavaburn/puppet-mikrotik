@@ -1,4 +1,6 @@
 Puppet::Type.newtype(:mikrotik_graph_resource) do
+  apply_to_all
+  
   ensurable do
     defaultvalues
     defaultto :present

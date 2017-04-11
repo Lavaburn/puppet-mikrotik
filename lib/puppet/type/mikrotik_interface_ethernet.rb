@@ -1,4 +1,6 @@
 Puppet::Type.newtype(:mikrotik_interface_ethernet) do
+  apply_to_all
+  
   ensurable do
     defaultto :present
     

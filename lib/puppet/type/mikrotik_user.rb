@@ -1,4 +1,6 @@
 Puppet::Type.newtype(:mikrotik_user) do
+  apply_to_all
+  
   ensurable do
     defaultto :present
     

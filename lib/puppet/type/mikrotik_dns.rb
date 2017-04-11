@@ -1,4 +1,6 @@
 Puppet::Type.newtype(:mikrotik_dns) do
+  apply_to_all
+  
   # Only 1 set of settings that is always enabled. NOT ensurable 
   
   newparam(:name) do
@@ -12,5 +14,6 @@ Puppet::Type.newtype(:mikrotik_dns) do
   
   newproperty(:allow_remote_requests) do
     desc 'Whether to allow incoming DNS requests (not router-local).'
+    newvalues(true, false)
   end
 end

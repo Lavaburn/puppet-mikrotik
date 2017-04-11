@@ -1,4 +1,6 @@
 Puppet::Type.newtype(:mikrotik_interface_vrrp) do
+  apply_to_all
+  
   ensurable do
     defaultto :present
     
