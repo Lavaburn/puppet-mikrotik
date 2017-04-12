@@ -23,7 +23,7 @@ Puppet::Type.type(:mikrotik_dns).provide(:mikrotik_api, :parent => Puppet::Provi
     new(
       :name                  => 'dns',
       :servers               => data['servers'].split(','),
-      :allow_remote_requests => (data['allow-remote-requests'] == 'true')
+      :allow_remote_requests => data['allow-remote-requests']
     )
   end
 
