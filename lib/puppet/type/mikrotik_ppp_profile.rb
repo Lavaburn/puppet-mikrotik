@@ -53,31 +53,26 @@ Puppet::Type.newtype(:mikrotik_ppp_profile) do
 
   newproperty(:change_tcp_mss) do
     desc 'Whether to change TCP MSS'
-    defaultto :default
     newvalues(:yes, :no, :default)
   end  
   
   newproperty(:use_upnp) do
     desc 'Whether to use uPnP'
-    defaultto :default
     newvalues(:yes, :no, :default)
   end  
 
   newproperty(:use_mpls) do
     desc 'Whether to use MPLS'
-    defaultto :default
     newvalues(:yes, :no, :required, :default)
   end
   
   newproperty(:use_compression) do
     desc 'Whether to use compression'
-    defaultto :default
     newvalues(:yes, :no, :default)
   end
   
   newproperty(:use_encryption) do
     desc 'Whether to use encryption'
-    defaultto :default
     newvalues(:yes, :no, :required, :default)
   end
   
