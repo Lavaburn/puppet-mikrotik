@@ -1,8 +1,6 @@
 require 'puppet/util/network_device/mikrotik'
 require 'puppet/util/network_device/transport/mikrotik'
 
-require 'mtik'
-
 class Puppet::Provider::Mikrotik_Api < Puppet::Provider
   def self.prefetch(resources)
     nodes = instances

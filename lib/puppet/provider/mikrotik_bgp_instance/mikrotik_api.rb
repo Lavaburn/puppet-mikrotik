@@ -1,7 +1,7 @@
 require 'puppet/provider/mikrotik_api'
 
 Puppet::Type.type(:mikrotik_bgp_instance).provide(:mikrotik_api, :parent => Puppet::Provider::Mikrotik_Api) do
-  confine feature: :mtik
+  confine :feature => :mtik
   
   mk_resource_methods
 

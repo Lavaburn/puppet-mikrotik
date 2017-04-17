@@ -1,7 +1,7 @@
 require 'puppet/provider/mikrotik_api'
 
 Puppet::Type.type(:mikrotik_interface_vlan).provide(:mikrotik_api, :parent => Puppet::Provider::Mikrotik_Api) do
-  confine feature: :mtik
+  confine :feature => :mtik
   
   mk_resource_methods
 
