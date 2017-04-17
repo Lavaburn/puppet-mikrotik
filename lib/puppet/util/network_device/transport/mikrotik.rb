@@ -2,7 +2,7 @@ require 'puppet/util/network_device'
 require 'puppet/util/network_device/transport'
 require 'puppet/util/network_device/transport/base'
 
-#require 'mtik' if Puppet.features.mtik?
+require 'mtik' if Puppet.features.mtik?
 
 class Puppet::Util::NetworkDevice::Transport::Mikrotik < Puppet::Util::NetworkDevice::Transport::Base
   attr_reader :connection
