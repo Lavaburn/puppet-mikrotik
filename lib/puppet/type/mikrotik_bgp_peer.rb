@@ -44,14 +44,34 @@ Puppet::Type.newtype(:mikrotik_bgp_peer) do
     desc 'Whether to originate routing table this instance belongs to.'
     newvalues('no', 'if-installed', 'always')
   end
-     
-  # multihop    
-  # tcp-md5-key   
   
-  # keepalive-time   
-  # hold-time             
-  # use-bfd   
+  newproperty(:multihop) do
+    desc 'Whether to allow multiple hops between peers.'
+    newvalues(true, false)
+  end
   
+  newproperty(:tcp_md5_key) do
+    desc 'The MD5 hash for securing the session.'
+  end
+  
+  newproperty(:keepalive_time) do
+    desc 'The time (seconds) to keep the session alive.'
+  end
+  
+  newproperty(:hold_time) do
+    desc 'The time (seconds) to hold the session up once keepalive exceeded.'
+  end
+  
+  newproperty(:use_bfd) do
+    desc 'Whether to use BFD to break a faulty session faster.'
+    newvalues(true, false)
+  end
+
+  newproperty(:remove_private_as) do
+    desc 'Whether to remove private ASNs when advertising to peer.'
+    newvalues(true, false)
+  end
+    
   # address-families    
   # allow-as-in      
   # as-override              
@@ -61,5 +81,5 @@ Puppet::Type.newtype(:mikrotik_bgp_peer) do
   # max-prefix-limit         
   # remote-port
   # max-prefix-restart-time  
-  # remove-private-as
+  # 
 end

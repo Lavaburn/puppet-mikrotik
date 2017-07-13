@@ -22,7 +22,13 @@ Puppet::Type.type(:mikrotik_bgp_peer).provide(:mikrotik_api, :parent => Puppet::
         :out_filter        => data['out-filter'],
         :in_filter         => data['in-filter'],
         :route_reflect     => data['route-reflect'],
-        :default_originate => data['default-originate']
+        :default_originate => data['default-originate'],
+        :multihop          => data['multihop'],
+        :tcp_md5_key       => data['tcp-md5-key'],
+        :keepalive_time    => data['keepalive-time'],
+        :hold_time         => data['hold-time'],
+        :use_bfd           => data['use-bfd'],
+        :remove_private_as => data['remove-private-as']
       )
   end
 
@@ -37,9 +43,16 @@ Puppet::Type.type(:mikrotik_bgp_peer).provide(:mikrotik_api, :parent => Puppet::
     params["update-source"] = resource[:source] if ! resource[:source].nil?
     params["out-filter"] = resource[:out_filter] if ! resource[:out_filter].nil?
     params["in-filter"] = resource[:in_filter] if ! resource[:in_filter].nil?
-    params["route-reflect"] = Puppet::Provider::Mikrotik_Api::convertBoolToYesNo(resource[:route_reflect]) if ! resource[:route_reflect].nil?
     params["default-originate"] = resource[:default_originate] if ! resource[:default_originate].nil?
-
+    params["tcp-md5-key"] = resource[:tcp_md5_key] if ! resource[:tcp_md5_key].nil?
+    params["keepalive-time"] = resource[:keepalive_time] if ! resource[:keepalive_time].nil?
+    params["hold-time"] = resource[:hold_time] if ! resource[:hold_time].nil?
+      
+    params["route-reflect"] = Puppet::Provider::Mikrotik_Api::convertBoolToYesNo(resource[:route_reflect]) if ! resource[:route_reflect].nil?
+    params["multihop"] = Puppet::Provider::Mikrotik_Api::convertBoolToYesNo(resource[:multihop]) if ! resource[:multihop].nil?
+    params["use-bfd"] = Puppet::Provider::Mikrotik_Api::convertBoolToYesNo(resource[:use_bfd]) if ! resource[:use_bfd].nil?
+    params["remove-private-as"] = Puppet::Provider::Mikrotik_Api::convertBoolToYesNo(resource[:remove_private_as]) if ! resource[:remove_private_as].nil?
+    
     lookup = {}
     lookup["name"] = resource[:name]
     
