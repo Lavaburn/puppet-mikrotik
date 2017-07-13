@@ -42,7 +42,7 @@ Puppet::Type.newtype(:mikrotik_bgp_peer) do
   
   newproperty(:default_originate) do
     desc 'Whether to originate routing table this instance belongs to.'
-    newvalues('no', 'if-installed', 'always')
+    newvalues('never', 'if-installed', 'always')
   end
   
   newproperty(:multihop) do
