@@ -1,0 +1,8 @@
+---
+# COPY THIS FILE TO testnodes.yaml and adjust according to your own test infra (Mikrotik Routers).
+testnodes:
+  'HOSTNAME1':
+    name: 'HOSTNAME1'
+    ip: 'IP1'
+    username: 'admin'
+    password: 'PASSWORD1'

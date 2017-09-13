@@ -55,8 +55,8 @@ RSpec.configure do |c|
         
       # Set device.conf
       device_conf = ""
-      @testnodes.each { |node| device_conf << "[#{node[:name]}]\n  type mikrotik\n  url api://admin:wimaxrouter@#{node[:ip]}\n" }
-        
+      @testnodes.each { |node| device_conf << "[#{node[:name]}]\n  type mikrotik\n  url api://#{node[:username]}:#{node[:password]}@#{node[:ip]}\n" }
+
       create_remote_file(agent, '/etc/puppetlabs/puppet/device.conf', device_conf)
     end
   end
@@ -99,10 +99,15 @@ def create_site_pp(site_pp)
 end
 
 def get_testnodes
-   [
-     { 
-       :name => 'dude1.rcswimax.com',
-       :ip   => '105.235.209.44',
-     }
-   ] 
- end
+  yaml = YAML.load_file("spec/fixtures/testnodes.yaml")
+  nodes = yaml["testnodes"].values.collect { |node|
+    {
+      :name     => node["name"],
+      :ip       => node["ip"],
+      :username => node["username"],
+      :password => node["password"],
+    
+    }
+  }  
+  nodes
+end

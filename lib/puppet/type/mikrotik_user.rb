@@ -46,7 +46,7 @@ Puppet::Type.newtype(:mikrotik_user) do
   end
   
   newproperty(:group) do
-    desc 'Group that the user belongs to'
+    desc 'Group that the user belongs to (required)'
   end
   
   newproperty(:addresses, :array_matching => :all) do
