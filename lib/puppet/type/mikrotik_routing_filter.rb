@@ -48,6 +48,10 @@ Puppet::Type.newtype(:mikrotik_routing_filter) do
   newproperty(:chain) do
     desc 'Filter Chain'
   end
+  
+  newproperty(:chain_order) do
+    desc 'Order number inside the chain (starts at 1).'
+  end
 
   # Matchers
   newproperty(:prefix) do

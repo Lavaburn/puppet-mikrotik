@@ -92,6 +92,8 @@ describe '/routing/filter' do
   include_context 'testnodes defined'
   
   context "create new filter" do
+    before { skip("Skipping this test for now") }
+
     it 'should update master' do
       site_pp = <<-EOS   
         mikrotik_routing_filter { 'test_filter1':
@@ -121,6 +123,240 @@ describe '/routing/filter' do
           set_bgp_med            => 50,                   
           append_bgp_communities => ['62124:30000'],
         }              
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+  
+  context "sort on insert" do
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_routing_filter { 'filter_chain2':
+          chain         => 'chain2',
+          prefix        => '1.2.3.100',
+          action        => 'accept',
+        }
+              
+        mikrotik_routing_filter { 'filter_a':
+          chain         => 'testing_sort',
+          chain_order   => 1,
+          prefix        => '1.2.3.2',
+          action        => 'accept',
+        }
+  
+        mikrotik_routing_filter { 'filter_d':
+          chain         => 'testing_sort',
+          chain_order   => 3,
+          prefix        => '1.2.3.4',
+          action        => 'accept',
+        }
+  
+        mikrotik_routing_filter { 'filter_chain3':
+          chain         => 'chain3',
+          prefix        => '1.2.3.110',
+          action        => 'accept',
+        }
+
+        mikrotik_routing_filter { 'filter_b':
+          chain         => 'testing_sort',
+          chain_order   => 2,
+          prefix        => '1.2.3.1',
+          action        => 'accept',
+        }
+        
+        mikrotik_routing_filter { 'filter_f':
+          chain         => 'testing_sort',
+          chain_order   => 5,
+          prefix        => '1.2.3.7',
+          action        => 'accept',
+        }
+  
+        mikrotik_routing_filter { 'filter_e':
+          chain         => 'testing_sort',
+          chain_order   => 4,
+          prefix        => '1.2.3.5',
+          action        => 'accept',
+        }
+  
+        mikrotik_routing_filter { 'filter_chain4':
+          chain         => 'chain4',
+          prefix        => '1.2.3.120',
+          action        => 'accept',
+        }  
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+
+  context "insert more" do
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_routing_filter { 'filter_c':
+          chain         => 'testing_sort',
+          chain_order   => 3,
+          prefix        => '1.2.3.3',
+          action        => 'accept',
+        }
+  
+        mikrotik_routing_filter { 'filter_g':
+          chain         => 'testing_sort',
+          chain_order   => 7,
+          prefix        => '1.2.3.6',
+          action        => 'accept',
+        }  
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+
+  context "move filters" do
+    it 'should update master' do
+      site_pp = <<-EOS
+        # side-by-side swap (starting FORWARD)
+        mikrotik_routing_filter { 'filter_a':
+          chain         => 'testing_sort',
+          chain_order   => 2,
+        }
+
+        # Should not make a change anymore
+        mikrotik_routing_filter { 'filter_b':
+          chain         => 'testing_sort',
+          chain_order   => 1,
+        }  
+        
+        # BACKWARD change
+        mikrotik_routing_filter { 'filter_g':
+          chain         => 'testing_sort',
+          chain_order   => 6,
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+
+  context "move filter to start of chain" do
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_routing_filter { 'filter_f':
+          chain         => 'testing_sort',
+          chain_order   => 1,
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+  
+  context "move filter to end of chain" do
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_routing_filter { 'filter_b':
+          chain         => 'testing_sort',
+          chain_order   => 7,
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+  
+  context "complex move" do
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_routing_filter { 'filter_chain2':
+          ensure => absent,
+        }
+        
+        mikrotik_routing_filter { 'filter_chain3':
+          ensure => absent,
+        }
+        
+        mikrotik_routing_filter { 'filter_chain4':
+          ensure => absent,
+        }      
+      
+        mikrotik_routing_filter { 'filter_f':
+          chain         => 'testing_sort',
+          chain_order   => 2,
+        }  
+        
+        mikrotik_routing_filter { 'filter_g':
+          chain         => 'testing_sort',
+          chain_order   => 3,
+        }  
+        
+        mikrotik_routing_filter { 'filter_e':
+          chain         => 'testing_sort',
+          chain_order   => 4,
+        }  
+        
+        mikrotik_routing_filter { 'filter_d':
+          chain         => 'testing_sort',
+          chain_order   => 5,
+        }  
+      
+        mikrotik_routing_filter { 'filter_c':
+          chain         => 'testing_sort',
+          chain_order   => 6,
+        }
+  
+        mikrotik_routing_filter { 'filter_a':
+          chain         => 'testing_sort',
+          chain_order   => 7,
+        }  
+        
+        mikrotik_routing_filter { 'filter_b':
+          chain         => 'testing_sort',
+          chain_order   => 8,
+        }
+
+        mikrotik_routing_filter { 'filter_h':
+          chain         => 'testing_sort',
+          chain_order   => 9,
+          prefix        => '1.2.3.0/30',
+          action        => 'accept',
+        }  
+        
+        mikrotik_routing_filter { 'filter_i':
+          chain         => 'testing_sort',
+          chain_order   => 1,
+          prefix        => '1.2.3.8',
+          action        => 'accept',
+        }  
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+
+  context "cleanup" do
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_routing_filter { ['filter_chain2', 'filter_chain3', 'filter_chain4']:
+          ensure => absent,          
+        }
+      
+        mikrotik_routing_filter { ['filter_a', 'filter_b', 'filter_c', 'filter_d', 'filter_e', 'filter_f', 'filter_g', 'filter_h', 'filter_i']:
+          ensure => absent,          
+        }        
       EOS
       
       set_site_pp_on_master(site_pp)

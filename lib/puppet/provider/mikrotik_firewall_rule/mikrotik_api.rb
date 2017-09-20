@@ -7,50 +7,44 @@ Puppet::Type.type(:mikrotik_firewall_rule).provide(:mikrotik_api, :parent => Pup
 
   def self.instances
     instances = []
-      
-    count = 0
+
     filter_rules = get_all("/ip/firewall/filter")
     filter_rules.each do |rule|
-      object = firewallRule(rule, 'filter', count)
+      object = firewallRule(rule, 'filter', filter_rules)
       if object != nil
         instances << object
-        count = count + 1
       end
     end
 
-    count = 0
     nat_rules = get_all("/ip/firewall/nat")
     nat_rules.each do |rule|
-      object = firewallRule(rule, 'nat', count)
+      object = firewallRule(rule, 'nat', nat_rules)
       if object != nil
         instances << object
-        count = count + 1
       end
     end
 
-    count = 0
     mangle_rules = get_all("/ip/firewall/mangle")
     mangle_rules.each do |rule|
-      object = firewallRule(rule, 'mangle', count)
+      object = firewallRule(rule, 'mangle', mangle_rules)
       if object != nil
         instances << object
-        count = count + 1
       end      
     end
-    
-    # TODO - sort per chain and inject sequence?
 
     instances
   end
   
-  def self.firewallRule(rule, table, count)
+  def self.firewallRule(rule, table, all_rules)
     if rule['comment'] != nil  
       if rule['disabled'] == 'true'
         state = :disabled
       else
         state = :enabled
       end
-      
+
+      chain_order = getChainOrder(rule['.id'], rule['chain'], all_rules)
+
       new(
         :ensure                    => :present,
         :state                     => state,
@@ -58,6 +52,7 @@ Puppet::Type.type(:mikrotik_firewall_rule).provide(:mikrotik_api, :parent => Pup
         :table                     => table,
         # General
         :chain                     => rule['chain'],
+        :chain_order               => chain_order.to_s,
         :src_address               => rule['src-address'],
         :dst_address               => rule['dst-address'],
         :protocol                  => rule['protocol'],
@@ -130,8 +125,7 @@ Puppet::Type.type(:mikrotik_firewall_rule).provide(:mikrotik_api, :parent => Pup
         :route_dst                 => rule['route-dst'],
         :sniff_id                  => rule['sniff-id'],
         :sniff_target              => rule['sniff-target'],
-        :sniff_target_port         => rule['sniff-target-port'],
-        :sequence                  => count
+        :sniff_target_port         => rule['sniff-target-port']
       )
     end
   end
@@ -150,10 +144,6 @@ Puppet::Type.type(:mikrotik_firewall_rule).provide(:mikrotik_api, :parent => Pup
       end
       table = resource[:table]
     end
-
-    # TODO - automate... below does not work...
-#    params = @property_hash.reject { |k, _v| !resource[k] }
-#    params.delete_if {|k,v| [:ensure, :name, :src_address].include? k }
     
     params = {}
         
@@ -161,6 +151,18 @@ Puppet::Type.type(:mikrotik_firewall_rule).provide(:mikrotik_api, :parent => Pup
       params["disabled"] = true
     elsif @property_hash[:state] == :enabled
       params["disabled"] = false
+    end
+
+    if !resource[:chain_order].nil?
+      table_rules = Puppet::Provider::Mikrotik_Api::get_all("/ip/firewall/#{table}")
+      ids = self.class.getChainIds(resource[:chain], table_rules)
+      
+      if @property_flush[:ensure] == :present
+        unless resource[:chain_order] > ids.length
+          rule_id_after = ids[resource[:chain_order].to_i - 1]# index starts at 0, order starts at 1
+          params["place-before"] = rule_id_after
+        end
+      end
     end
 
     params["comment"] = resource[:name]
@@ -238,14 +240,87 @@ Puppet::Type.type(:mikrotik_firewall_rule).provide(:mikrotik_api, :parent => Pup
     params["sniff-id"] = resource[:sniff_id] if ! resource[:sniff_id].nil?
     params["sniff-target"] = resource[:sniff_target] if ! resource[:sniff_target].nil?
     params["sniff-target-port"] = resource[:sniff_target_port] if ! resource[:sniff_target_port].nil?
-
-    # TODO - INSERT_BEFORE (?) resource[:sequence]
-    # TODO - move @property_hash[:sequence] destination=resource[:sequence]
       
     lookup = { "comment" => resource[:name] }
     
     Puppet.debug("Rule: #{params.inspect} - Lookup: #{lookup.inspect}")
 
     simple_flush("/ip/firewall/#{table}", params, lookup)
+      
+    if !resource[:chain_order].nil?
+      if @property_flush.empty?
+        id_list = Puppet::Provider::Mikrotik_Api::lookup_id("/ip/firewall/#{table}", lookup)
+        id_list.each do |id|
+          chain_order = self.class.getChainOrder(id, resource[:chain], table_rules)
+          if resource[:chain_order].to_i != chain_order
+            self.class.moveRule(id, table, resource[:chain], chain_order, resource[:chain_order].to_i, table_rules)
+          end
+        end
+      end
+    end
+  end
+    
+  def self.getChainOrder(lookup_id, lookup_chain, table_rules)    
+    ids = getChainIds(lookup_chain, table_rules)
+    
+    chain_order = 1
+    ids.each do |id|
+      if id == lookup_id
+         return chain_order
+      end        
+     
+      chain_order = chain_order + 1
+    end
+  end
+  
+  def self.getChainIds(lookup_chain, table_rules)
+    ids = table_rules.collect do |rule|
+      if rule['chain'] == lookup_chain
+        rule['.id']
+      end
+    end
+    
+    ids.compact
+  end
+    
+  def self.moveRule(rule_id, table, lookup_chain, old_chain_order, new_chain_order, table_rules)
+    Puppet.debug("Moving rule #{rule_id} from position #{old_chain_order} to position #{new_chain_order} in chain #{lookup_chain} on table #{table}.")
+    
+    if new_chain_order == old_chain_order
+      return
+    end
+  
+    if new_chain_order > old_chain_order
+      lookup_order = new_chain_order + 1
+    else
+      lookup_order = new_chain_order
+    end
+  
+    destination = nil
+    chain_pos = 0
+  
+    table_rules.each do |rule|
+      if rule['chain'] == lookup_chain
+        chain_pos = chain_pos + 1         
+      end
+      
+      if chain_pos == new_chain_order
+        destination = rule['.id']  
+      end
+      
+      if chain_pos == lookup_order
+        destination = rule['.id']   
+        break
+      end
+    end
+  
+    if rule_id == destination
+      return
+    end
+  
+    move_params = {}
+    move_params["numbers"] = rule_id
+    move_params["destination"] = destination if destination != nil
+    result = Puppet::Provider::Mikrotik_Api::move("/ip/firewall/#{table}", move_params)
   end
 end

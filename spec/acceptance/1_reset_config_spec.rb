@@ -311,6 +311,24 @@ describe 'reset configuration' do
           transport_address => '0.0.0.0',
           loop_detect       =>  false,
         }
+        
+        mikrotik_routing_filter { ['filter_chain2', 'filter_chain3', 'filter_chain4']:
+          ensure => absent,          
+        }
+      
+        mikrotik_routing_filter { ['filter_a', 'filter_b', 'filter_c', 'filter_d', 'filter_e', 'filter_f', 'filter_g', 'filter_h', 'filter_i']:
+          ensure => absent,          
+        }
+        
+        mikrotik_firewall_rule { ['unsorted_1', 'unsorted_2', 'unsorted_3']:
+          ensure => absent, 
+          table  => 'mangle',          
+        }
+  
+        mikrotik_firewall_rule { ['rule_a', 'rule_b', 'rule_c', 'rule_d', 'rule_e', 'rule_f', 'rule_g', 'rule_h', 'rule_i']:
+          ensure => absent,    
+          table  => 'mangle',       
+        }
       EOS
       
       set_site_pp_on_master(site_pp)

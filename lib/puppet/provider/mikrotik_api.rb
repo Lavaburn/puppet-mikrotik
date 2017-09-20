@@ -40,7 +40,7 @@ class Puppet::Provider::Mikrotik_Api < Puppet::Provider
     end
     result
   end
-  
+
   def self.set(path, params_hash)
     Puppet.debug("Storing Config #{path}: #{params_hash.inspect}")
     
@@ -88,6 +88,21 @@ class Puppet::Provider::Mikrotik_Api < Puppet::Provider
     end
   end
 
+  def self.move(path, params_hash)
+    Puppet.debug("Moving Config #{path}: #{params_hash.inspect}")
+    
+    params = []
+    params << params_hash.collect { |k,v| "=#{k}=#{v}" }
+    
+    result = connection.get_reply("#{path}/move", *params)
+    Puppet.debug("Move Result: #{result}")
+    result.each do |res|
+      if res.key?('!trap')
+        raise "Error while moving #{path}: #{res['message']}"
+      end
+    end
+  end
+  
   def initialize(value = {})
     super(value)
     

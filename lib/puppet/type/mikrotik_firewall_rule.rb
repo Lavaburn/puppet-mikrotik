@@ -46,11 +46,7 @@ Puppet::Type.newtype(:mikrotik_firewall_rule) do
     desc 'The unique identifier for the rule'
     isnamevar
   end
-      
-  newparam(:sequence) do
-    desc 'Sequence of the rule in the chain'
-  end
-  
+
   newparam(:table) do
     desc 'The table to which the rule applies (filter,nat,mangle)'
   end
@@ -59,7 +55,11 @@ Puppet::Type.newtype(:mikrotik_firewall_rule) do
   newproperty(:chain) do
     desc 'The chain to which the rule applies (input,output,filter,src-nat,...)'
   end
-  
+
+  newproperty(:chain_order) do
+    desc 'Order number inside the chain (starts at 1).'
+  end
+
   newproperty(:src_address) do  # src-address
     desc 'Source address with mask'
   end
