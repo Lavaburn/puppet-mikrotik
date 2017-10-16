@@ -69,6 +69,6 @@ Puppet::Type.newtype(:mikrotik_interface_vlan) do
   newproperty(:use_service_tag) do
     desc 'Whether to use VLAN Service Tag'
     newvalues(false, true)
-    defaultto true
+    defaultto false
   end
 end

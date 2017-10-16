@@ -41,7 +41,7 @@ Puppet::Type.newtype(:mikrotik_ip_address) do
   end
   
   newparam(:address) do
-    desc 'SNMP community name'
+    desc 'IP Address (CIDR notation)'
     isnamevar
   end
   

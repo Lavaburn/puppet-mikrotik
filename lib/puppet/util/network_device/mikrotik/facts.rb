@@ -12,13 +12,18 @@ class Puppet::Util::NetworkDevice::Mikrotik::Facts
   end
 
   def retrieve
-    facts = {}
-    
+    facts_raw = {}    
     system_resources = connection.get_reply("/system/resource/getall")    
     system_resources.each do |system_resource| 
       if system_resource.key?('!re')
-        facts = system_resource.reject { |k, v| ['!re', '.tag'].include? k }
+        facts_raw = system_resource.reject { |k, v| ['!re', '.tag'].include? k }
       end
+    end
+    
+    facts = {}
+    facts_raw.each do |k, v|
+      new_key = k.gsub(/-/, '_')
+      facts[new_key] = v
     end
     
     facts
