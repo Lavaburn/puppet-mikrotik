@@ -42,12 +42,12 @@ Puppet::Type.newtype(:mikrotik_ospf_interface) do
   newproperty(:passive) do
     desc 'Whether the interface is passive (not participating in OSPF)'
     newvalues(false, true)
-    defaultto true
+    defaultto false
   end
   
   newproperty(:use_bfd) do # use-bfd
     desc 'Whether to enable BFD on the interface for the OSPF process'
     newvalues(false, true)
-    defaultto true
+    defaultto false
   end
 end
