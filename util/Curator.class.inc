@@ -1,7 +1,9 @@
 <?php 
-class Curator {  
-  public function __construct($DB) {
-    $this->DB = $DB;
+class Curator {
+  private $database;
+	
+  public function __construct($database) {
+    $this->database = $database;
   }
   
   public function archiveStatistics() {
@@ -10,10 +12,10 @@ class Curator {
     
     // Remove Archive Table if one year old table exists
     $archive_table = "archive_rf_stats_".date("Y_m", $date_1year);
-    $archive_table_test = $this->DB->query("SELECT 1 FROM $archive_table");
+    $archive_table_test = $this->database->query("SELECT 1 FROM $archive_table");
     if ($archive_table_test !== FALSE) {
       LogUtil::info(MODULE, "Found 1-year old archive table: $archive_table. Deleting the table now.");
-      $res = $this->DB->query("DROP TABLE $archive_table");
+      $res = $this->database->query("DROP TABLE $archive_table");
       if (!$res) {
         LogUtil::critical(MODULE, "Failed to remove table: $archive_table !");
       }
@@ -22,7 +24,7 @@ class Curator {
     // Move uploaded data older than 1 month to (monthly) archive table (auto-create table) 
     $count = 0;
     $unique_days = array();
-    $statistics = $this->DB->query("SELECT * FROM rf_stats WHERE uploaded = '1' AND check_time < '".date("Y-m-d 00:00:00", $date_1month)."'");
+    $statistics = $this->database->query("SELECT * FROM rf_stats WHERE uploaded = '1' AND check_time < '".date("Y-m-d 00:00:00", $date_1month)."'");
     while ($row = $statistics->fetch_assoc()) {
       //Time
       $time = strtotime($row["check_time"]);      
@@ -31,9 +33,9 @@ class Curator {
       
       //Create Table (if not yet exists)
       $archive_table = "archive_rf_stats_".$month;
-      $archive_table_test = $this->DB->query("SELECT 1 FROM $archive_table");
+      $archive_table_test = $this->database->query("SELECT 1 FROM $archive_table");
       if ($archive_table_test === FALSE) {
-        $this->DB->query("
+        $this->database->query("
           CREATE TABLE IF NOT EXISTS $archive_table (
             `mac` varchar(20) NOT NULL,
             `bsr_ip` varchar(20) NOT NULL,
@@ -53,8 +55,8 @@ class Curator {
       
       //Move Record
       $condition = "WHERE mac = '".$row["mac"]."' AND check_time = '".$row["check_time"]."'";
-      $this->DB->query("INSERT INTO $archive_table SELECT * FROM rf_stats $condition");
-      $this->DB->query("DELETE FROM rf_stats $condition");
+      $this->database->query("INSERT INTO $archive_table SELECT * FROM rf_stats $condition");
+      $this->database->query("DELETE FROM rf_stats $condition");
       
       //Stats
       if (!in_array($day, $unique_days)) $unique_days[] = $day;      

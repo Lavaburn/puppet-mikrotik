@@ -17,51 +17,51 @@ define("OID_CPE_CONFIG_TYPE", 	    OID_VLAN_CPE.	".1.1.6.1");
 define("OID_CPE_CONFIG_TAGGED", 	OID_VLAN_CPE.	".2.1.3.1");
 
 class SNMPUtil {
-  public static function getData($ip, $community, $oid) {
+  public static function getData($ipAddress, $community, $oid) {
     $result = array();
     
-    $raw_data = @snmprealwalk($ip, $community, $oid);
+    $raw_data = @snmprealwalk($ipAddress, $community, $oid);
     if (!empty($raw_data)) {
-      foreach ($raw_data as $id => $value) {
-        $clean_id = self::clean_id($id, $oid);
+      foreach ($raw_data as $rawId => $value) {
+        $clean_id = self::clean_id($rawId, $oid);
         $clean_value = self::clean_value($value);      
         $result[$clean_id] = $clean_value;
       }
-    } else {
-      LogUtil::warning(MODULE, "Could not retrieve SNMP data for $ip ($community) with OID: $oid");
+      return $result;
     }
+    
+    LogUtil::warning(MODULE, "Could not retrieve SNMP data for $ipAddress ($community) with OID: $oid");    
     return $result;
   }
   
-  private static function clean_id($raw_id, $OID) {
-    if (preg_match("/^SNMPv2-SMI::enterprises/", $raw_id)) {
-      $OID2 = preg_replace("/^".OID_PRIVATE."/", "SNMPv2-SMI::enterprises", $OID);
+  private static function clean_id($rawId, $oid) {
+    if (preg_match("/^SNMPv2-SMI::enterprises/", $rawId)) {
+      $oid2 = preg_replace("/^".OID_PRIVATE."/", "SNMPv2-SMI::enterprises", $oid);
     }
     
-    if (preg_match("/^iso/", $raw_id)) {
-      $OID2 = preg_replace("/^1/", "iso", $OID);
+    if (preg_match("/^iso/", $rawId)) {
+      $oid2 = preg_replace("/^1/", "iso", $oid);
     }
     
-    if (preg_match("/^.1/", $raw_id)) {
-      $OID2 = $OID;      
+    if (preg_match("/^.1/", $rawId)) {
+      $oid2 = $oid;      
     }
     
-    $id = preg_replace("/^\.$OID2\./", "", $raw_id);   
-    return $id;
+    return preg_replace("/^\.$oid2\./", "", $rawId);
   }
   
-  private static function clean_value($raw_value) {
-    $raw_value = preg_replace("/INTEGER: /", "", $raw_value);
-	$raw_value = preg_replace("/Counter32: /", "", $raw_value);
-	$raw_value = preg_replace("/IpAddress: /", "", $raw_value);
-	$raw_value = preg_replace("/Hex-STRING: /", "", $raw_value);
+  private static function clean_value($rawValue) {
+    $rawValue = preg_replace("/INTEGER: /", "", $rawValue);
+	$rawValue = preg_replace("/Counter32: /", "", $rawValue);
+	$rawValue = preg_replace("/IpAddress: /", "", $rawValue);
+	$rawValue = preg_replace("/Hex-STRING: /", "", $rawValue);
 	
-	if (preg_match("/STRING: /", $raw_value)) {
-		$raw_value = preg_replace("/STRING: /", "", $raw_value);
-		$raw_value = preg_replace("/\"/", "", $raw_value);
+	if (preg_match("/STRING: /", $rawValue)) {
+		$rawValue = preg_replace("/STRING: /", "", $rawValue);
+		$rawValue = preg_replace("/\"/", "", $rawValue);
 	}
 	
-	return $raw_value;
+	return $rawValue;
   }
 }
 ?>

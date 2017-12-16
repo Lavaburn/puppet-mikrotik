@@ -6,6 +6,7 @@ require_once("/etc/rcs/airspan/settings.inc");
 
 require_once(ROOT."/common/db.inc");
 
+require_once(ROOT."/util/Airspan.class.inc");
 require_once(ROOT."/util/AirspanDB.class.inc");
 require_once(ROOT."/util/GraphiteUtil.class.inc");
 require_once(ROOT."/util/LogUtil.class.inc");
@@ -99,35 +100,8 @@ foreach ($cpe_config_tagged as $oid_suffix => $type) {
 }
 
 // C - CPE List - RF Statistics
-$ms_stats = array();
 $cpe_stats = SNMPUtil::getData($IP, SNMP_COMMUNITY, OID_CPE_RF_STATS);
-foreach ($cpe_stats as $oid_suffix => $value) {
-  $oid_suffix_parts = explode("." , $oid_suffix);
-  $index = $oid_suffix_parts[0];
-
-  $MAC_decimal = preg_replace("/^$index\.1\./", "", $oid_suffix);
-  $MAC = Util::convertMAC($MAC_decimal);
-
-  switch ($index) {
-    case 1:		$ms_stats[$MAC]["rssi_down"] = $value - 123;
-                break;
-    case 2:		$ms_stats[$MAC]["rssi_up"] = $value / 4;
-                break;
-    case 12:	$ms_stats[$MAC]["cinr_down"] = $value / 4;
-                break;
-    case 5:		$ms_stats[$MAC]["cinr_up"] = $value / 4;
-                break;
-    case 14:	$ms_stats[$MAC]["modulation_down"] = $value + 1;//0 = QPSK1/2, 7 = 64QAM5/6
-                break;
-    case 6:		$ms_stats[$MAC]["modulation_up"] = $value;// 8 = 64QAM5/6, 1 = QPSK1/2
-                break;
-    case 11:	$ms_stats[$MAC]["mimo"] = $value;//0 = MatrixA, 1 = MatrixB
-                break;
-    case 13:	$ms_stats[$MAC]["tx_power"] = $value;
-                break;
-    default: 	//Do Nothing
-  }
-}
+$ms_stats = Airspan::parseMsStats($cpe_stats);
 
 // SNMP Error, incomplete result.
 foreach ($ms_stats as $MAC => $config) {

@@ -13,9 +13,10 @@ class GraphiteUtil {
   public function send($name, $value) {
     $line = $this->prefix.".$name $value ".time()."\n";
     
-    $fp = fsockopen($this->hostname, $this->port, $err, $errc, 1);// hostname = udp:// ?
-    fwrite($fp, $line);    
-    fclose($fp);
+    $err = 0; $errc = '';
+    $socket = fsockopen($this->hostname, $this->port, $err, $errc, 1);// hostname = udp:// ?
+    fwrite($socket, $line);    
+    fclose($socket);
   }
 }
 ?>

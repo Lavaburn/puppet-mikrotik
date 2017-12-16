@@ -1,8 +1,8 @@
 <?php 
 class Util {
-  public static function convertMAC($MAC_decimal) {
+  public static function convertMAC($macDecimal) {
     $hex = "";
-    $parts = explode("." , $MAC_decimal);
+    $parts = explode("." , $macDecimal);
     foreach ($parts as $part) {
       if ($hex != "") $hex .= ":";
       $hex .= ($part<16?"0":"").strtoupper(dechex($part));
@@ -10,9 +10,12 @@ class Util {
     return $hex;
   }
   
-  public static function summarizePerModcod($ms_stats) {
+  /**
+   * @SuppressWarnings(PHPMD.UnusedLocalVariable)
+   */
+  public static function summarizePerModcod($msStats) {
   	$modcodTable = array();
-  	foreach ($ms_stats as $MAC => $stats) {
+  	foreach ($msStats as $mac => $stats) {
   		self::increase($modcodTable, "raw.uplink.0.".$stats["modulation_up"]);
   		self::increase($modcodTable, "raw.downlink.".$stats["mimo"].".".$stats["modulation_down"]);
   		
