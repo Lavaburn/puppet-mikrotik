@@ -1,7 +1,7 @@
 require 'spec_helper_acceptance'
 
 describe '/ppp' do
-  before { skip("Skipping this test for now") }
+  #before { skip("Skipping this test for now") }
   
   include_context 'testnodes defined'
 

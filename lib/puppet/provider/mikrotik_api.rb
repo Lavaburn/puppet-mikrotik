@@ -80,6 +80,7 @@ class Puppet::Provider::Mikrotik_Api < Puppet::Provider
     params << params_hash.collect { |k,v| "=#{k}=#{v}" }
     
     result = connection.get_reply("#{path}/remove", *params)
+
     Puppet.debug("Remove Result: #{result}")  
     result.each do |res|
       if res.key?('!trap')
@@ -240,7 +241,7 @@ class Puppet::Provider::Mikrotik_Api < Puppet::Provider
   end
   
   def self.convertBoolToYesNo(str)
-    result = str.to_s == 'true'?"yes":"no"
+    result = str.to_s == 'true' ? "yes" : "no"
     result
   end
   
