@@ -206,6 +206,7 @@ Puppet::Type.type(:mikrotik_firewall_rule).provide(:mikrotik_api, :parent => Pup
     params["tcp-mss"] = resource[:tcp_mss] if ! resource[:tcp_mss].nil?
     params["packet-size"] = resource[:packet_size] if ! resource[:packet_size].nil?
     params["random"] = resource[:random] if ! resource[:random].nil?
+    params["tcp-flags"] = resource[:tcp_flags] if ! resource[:tcp_flags].nil?  
     params["ipv4-options"] = resource[:ipv4_options] if ! resource[:ipv4_options].nil?
     params["ttl"] = resource[:ttl] if ! resource[:ttl].nil?
     # Extra
