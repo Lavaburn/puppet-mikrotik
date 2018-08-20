@@ -123,6 +123,10 @@ describe 'reset configuration' do
         mikrotik_schedule { 'daily_run_script1': 
           ensure => absent,
         }
+        
+        mikrotik_upgrade_source { '105.235.209.43':
+          ensure => absent,
+        }
          
         #
         mikrotik_ip_settings { 'ip':
