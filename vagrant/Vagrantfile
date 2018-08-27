@@ -1,0 +1,15 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "dulin/mikrotik"
+
+  config.ssh.username = "vagrant"
+  config.ssh.password = "vagrant"
+
+  config.ssh.keys_only = false
+  config.ssh.insert_key = false
+
+  config.vm.box_check_update = false
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+
+  config.vm.network "forwarded_port", guest: 8728, host: 8728
+  config.vm.network "forwarded_port", guest: 8291, host: 8291
+end

@@ -4,6 +4,11 @@ describe 'reset configuration' do
   before { skip("Skipping this test for now") }
   
   include_context 'testnodes defined'
+
+  before(:each) do
+    # Upgrade Source
+    @upgrade_source = get_upgrade_source
+  end 
   
   context "first run" do  
     before(:all) do
@@ -124,7 +129,8 @@ describe 'reset configuration' do
           ensure => absent,
         }
         
-        mikrotik_upgrade_source { '105.235.209.43':
+        # upgrade spec
+        mikrotik_upgrade_source { '#{@upgrade_source[:hostname]}':
           ensure => absent,
         }
          

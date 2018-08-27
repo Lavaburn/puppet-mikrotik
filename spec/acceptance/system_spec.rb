@@ -96,57 +96,11 @@ describe '/system' do
     it_behaves_like 'an idempotent device run'
   end
 
-  context "enable schedule" do
-    before { skip("Skipping this test for now") }
-      
+  context "enable schedule" do      
     it 'should update master' do
       site_pp = <<-EOS    
         mikrotik_schedule { 'daily_run_script1': 
           ensure => enabled
-        }
-      EOS
-      
-      set_site_pp_on_master(site_pp)
-    end
-  
-    it_behaves_like 'an idempotent device run'
-  end
-  
-  context "add package source" do
-    it 'should update master' do
-      site_pp = <<-EOS            
-        mikrotik_upgrade_source { '105.235.209.43':
-          username => 'upgrade',
-          password => 'upgradeME',
-        }
-      EOS
-      
-      set_site_pp_on_master(site_pp)
-    end
-  
-    it_behaves_like 'an idempotent device run'
-  end
-
-  context "update package source" do
-    it 'should update master' do
-      site_pp = <<-EOS            
-        mikrotik_upgrade_source { '105.235.209.43':
-          username => 'upgrade2',
-          password => 'upgradeME2',
-        }
-      EOS
-      
-      set_site_pp_on_master(site_pp)
-    end
-  
-    it_behaves_like 'an idempotent device run'
-  end
-  
-  context "remove package source" do
-    it 'should update master' do
-      site_pp = <<-EOS            
-        mikrotik_upgrade_source { '105.235.209.43':
-          ensure => absent,
         }
       EOS
       

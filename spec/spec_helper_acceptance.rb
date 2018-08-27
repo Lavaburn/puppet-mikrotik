@@ -1,5 +1,7 @@
 require 'beaker-rspec'
 
+require 'support/changing_device_run'
+require 'support/empty_device_run'
 require 'support/faulty_device_run'
 require 'support/idempotent_device_run'
 require 'support/idempotent_manifest'
@@ -105,9 +107,20 @@ def get_testnodes
       :name     => node["name"],
       :ip       => node["ip"],
       :username => node["username"],
-      :password => node["password"],
-    
+      :password => node["password"],    
     }
-  }  
+  }
   nodes
+end
+
+def get_upgrade_source
+  yaml = YAML.load_file("spec/fixtures/upgrade_source.yaml")
+
+  {
+    :hostname => yaml["hostname"],
+    :username => yaml["username"],
+    :password => yaml["password"],
+    :version1 => yaml["version1"],
+    :version2 => yaml["version2"],
+  }
 end

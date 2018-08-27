@@ -31,10 +31,10 @@ Puppet::Type.newtype(:mikrotik_ip_route) do
             return (provider.getState != :absent)
           when :absent
             return (provider.getState == :absent)
-          when :enabled                   
+          when :enabled
             return (provider.getState == :enabled)
-          when :disabled                      
-            return (provider.getState == :disabled)       
+          when :disabled
+            return (provider.getState == :disabled)
         end
       }      
     end

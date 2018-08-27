@@ -1,8 +1,17 @@
 ---
 # COPY THIS FILE TO testnodes.yaml and adjust according to your own test infra (Mikrotik Routers).
 testnodes:
+  # Phyiscal Router
   'HOSTNAME1':
     name: 'HOSTNAME1'
     ip: 'IP1'
     username: 'admin'
     password: 'PASSWORD1'
+  # Mikrotik CHR
+  # cd vagrant; vagrant up
+  'vagrant_node':
+    name: 'vagrant_node'
+    ip: '192.168.1.1'   # Your Computer LAN IP ! (ifconfig)
+    username: 'vagrant'
+    password: 'vagrant'
+  

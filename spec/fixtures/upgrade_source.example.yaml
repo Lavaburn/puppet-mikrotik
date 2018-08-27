@@ -1,0 +1,8 @@
+---
+# COPY THIS FILE TO upgrade_source.yaml and adjust according to your own test infra (Mikrotik Routers).
+# The router should contain 2 x86 packages (routeros-x86-V.npk)
+hostname: 'IP1'
+username: 'admin'
+password: 'PASSWORD1'
+version1: '6.40.8'
+version2: '6.42.7'

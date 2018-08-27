@@ -103,6 +103,21 @@ class Puppet::Provider::Mikrotik_Api < Puppet::Provider
     end
   end
   
+  def self.command(path, params_hash = {})
+    Puppet.debug("Running Command: #{path}: #{params_hash.inspect}")
+
+    params = []
+    params << params_hash.collect { |k,v| "=#{k}=#{v}" }
+      
+    result = connection.get_reply(path, *params)
+    Puppet.debug("Command Result: #{result}")
+    result.each do |res|
+      if res.key?('!trap')
+        raise "Error while running command #{path}: #{res['message']}"
+      end
+    end
+  end
+  
   def initialize(value = {})
     super(value)
     
