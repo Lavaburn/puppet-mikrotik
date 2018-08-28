@@ -41,7 +41,7 @@ Puppet::Type.type(:mikrotik_user).provide(:mikrotik_api, :parent => Puppet::Prov
     end
     
     params["name"] = resource[:name]
-    params["group"] = resource[:group]
+    params["group"] = resource[:group] if ! resource[:group].nil?
     params["address"] = resource[:addresses].join(',') if ! resource[:addresses].nil?
     params["password"] = resource[:password] if ! resource[:password].nil?
       

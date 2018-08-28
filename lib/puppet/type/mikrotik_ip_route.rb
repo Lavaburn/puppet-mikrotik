@@ -13,10 +13,12 @@ Puppet::Type.newtype(:mikrotik_ip_route) do
     end
     
     newvalue(:enabled) do
+      provider.create  
       provider.setState(:enabled)      
     end
 
     newvalue(:disabled) do
+      provider.create  
       provider.setState(:disabled)
     end
 

@@ -4,11 +4,42 @@ describe '/ip/firewall' do
   before { skip("Skipping this test for now") }
   
   include_context 'testnodes defined'
+
+  context "reset configuration" do      
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_firewall_rule { ['Puppet Test 1', 'Puppet Test 2', 'Puppet Test 3']:
+          ensure => absent, 
+          table  => 'filter',          
+        }
+        
+        mikrotik_firewall_rule { ['SSH_JUMP', 'SSH_DROP', 'SSH_STAGE3', 'SSH_STAGE2', 'SSH_STAGE1', 'SSH_NEW']:
+          ensure => absent, 
+          table  => 'filter',          
+        }
+        
+        mikrotik_firewall_rule { ['unsorted_1', 'unsorted_2', 'unsorted_3']:
+          ensure => absent, 
+          table  => 'mangle',          
+        }
+  
+        mikrotik_firewall_rule { ['rule_a', 'rule_b', 'rule_c', 'rule_d', 'rule_e', 'rule_f', 'rule_g', 'rule_h', 'rule_i']:
+          ensure => absent,    
+          table  => 'mangle',       
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run after failures', 1
+  end  
   
   context "create 3 new rules" do
     it 'should update master' do
       site_pp = <<-EOS
         mikrotik_firewall_rule { 'Puppet Test 1':
+          ensure      => present,
           table       => 'filter',
           chain       => 'input',
           src_address => '1.1.1.1',
@@ -17,6 +48,7 @@ describe '/ip/firewall' do
         }
         
         mikrotik_firewall_rule { 'Puppet Test 2':
+          ensure      => enabled,
           table       => 'filter',
           chain       => 'input',
           src_address => '1.1.1.2',
@@ -25,6 +57,7 @@ describe '/ip/firewall' do
         }
         
         mikrotik_firewall_rule { 'Puppet Test 3':
+          ensure      => disabled,
           table       => 'filter',
           chain       => 'input',
           src_address => '1.1.1.3',
@@ -73,7 +106,7 @@ describe '/ip/firewall' do
     it 'should update master' do
       site_pp = <<-EOS
         mikrotik_firewall_rule { 'SSH_JUMP':
-          ensure           => present,                  # TODO - BUGFIX ???
+          ensure           => present,
           table            => 'filter',
           chain            => 'input',
           protocol         => 'tcp',
@@ -84,7 +117,7 @@ describe '/ip/firewall' do
         }
         
         mikrotik_firewall_rule { 'SSH_DROP':
-          ensure           => 'enabled',                  # TODO - BUGFIX ???
+          ensure           => 'enabled',
           table            => 'filter',
           chain            => 'SSH',
           src_address_list => 'ssh_block',
@@ -92,7 +125,7 @@ describe '/ip/firewall' do
         }
 
         mikrotik_firewall_rule { 'SSH_STAGE3':
-          ensure           => 'disabled',                  # TODO - BUGFIX ???
+          ensure           => 'disabled',
           table            => 'filter',
           chain            => 'SSH',
           connection_state => 'new',

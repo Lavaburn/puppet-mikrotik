@@ -5,15 +5,41 @@ describe '/routing/bgp' do
   
   include_context 'testnodes defined'
 
+  context "reset configuration" do      
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_bgp_instance { 'PUPPET':
+          ensure => absent,
+        }
+        
+        mikrotik_bgp_peer { 'peer1':
+          ensure => absent,
+        }
+  
+        mikrotik_bgp_network { ['1.1.1.0/24', '1.1.2.0/24', '1.1.3.0/24']: 
+          ensure => absent,
+        }
+          
+        mikrotik_bgp_aggregate { ['1.1.0.0/16', '1.2.0.0/16', '1.3.0.0/16']:
+          ensure => absent,
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run after failures', 2
+  end  
+
   context "instance creation" do
     it 'should update master' do
       site_pp = <<-EOS  
-        mikrotik_bgp_instance { 'RCS':
-          as                          => '37406',
-          router_id                   => '105.235.209.44',
+        mikrotik_bgp_instance { 'PUPPET':
+          as                          => '64500',
+          router_id                   => '1.2.3.4',
           redistribute_connected      => true,
           redistribute_static         => true,
-          out_filter                  => 'RCS_OUT',
+          out_filter                  => 'PUPPET_OUT',
           client_to_client_reflection => true,
         }
       EOS
@@ -27,10 +53,10 @@ describe '/routing/bgp' do
   context "instance update" do
     it 'should update master' do
       site_pp = <<-EOS  
-        mikrotik_bgp_instance { 'RCS':
+        mikrotik_bgp_instance { 'PUPPET':
           redistribute_connected      => false,
           redistribute_static         => false,
-          out_filter                  => 'RCS_OUT1',
+          out_filter                  => 'PUPPET_OUT1',
         }
       EOS
       
@@ -43,13 +69,13 @@ describe '/routing/bgp' do
   context "peers creation" do
     it 'should update master' do
       site_pp = <<-EOS  
-        mikrotik_bgp_peer { 'dude1':
-          instance           => 'RCS',
-          peer_address       => '105.235.209.43',
-          peer_as            => '37406',
+        mikrotik_bgp_peer { 'peer1':
+          instance           => 'PUPPET',
+          peer_address       => '1.2.3.6',
+          peer_as            => '64500',
           source             => 'ether1',       
-          out_filter         => 'RCS_PEER_OUT',
-          in_filter          => 'RCS_PEER_IN',
+          out_filter         => 'PUPPET_PEER_OUT',
+          in_filter          => 'PUPPET_PEER_IN',
           route_reflect      =>  true,
           default_originate  => 'always',
         }
@@ -64,12 +90,158 @@ describe '/routing/bgp' do
   context "peers update" do
     it 'should update master' do
       site_pp = <<-EOS  
-        mikrotik_bgp_peer { 'dude1':
-          source             => '105.235.209.44',   
-          out_filter         => 'RCS_PEER_OUT2',
-          in_filter          => 'RCS_PEER_IN2',
+        mikrotik_bgp_peer { 'peer1':
+          source             => '1.2.3.4',   
+          out_filter         => 'PUPPET_PEER_OUT2',
+          in_filter          => 'PUPPET_PEER_IN2',
           route_reflect      =>  false,
           default_originate  => 'if-installed',
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+  
+  context "create BGP aggregate" do
+    it 'should update master' do
+      site_pp = <<-EOS  
+        mikrotik_bgp_aggregate { '1.1.0.0/16': 
+          instance         => 'PUPPET',
+          summary_only     => true,
+          attribute_filter => 'ATTRIBS1'
+        }
+          
+        mikrotik_bgp_aggregate { '1.2.0.0/16': 
+          ensure             => present,
+          instance           => 'PUPPET',
+          inherit_attributes => false,
+          suppress_filter    => 'SUPRESS2',
+        }
+          
+        mikrotik_bgp_aggregate { '1.3.0.0/16': 
+          ensure           => disabled,
+          instance         => 'PUPPET',
+          include_igp      => true,
+          advertise_filter => 'ADV3',
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+  
+  context "update BGP aggregate" do
+    it 'should update master' do
+      site_pp = <<-EOS  
+        mikrotik_bgp_aggregate { '1.1.0.0/16': 
+          instance         => 'PUPPET',
+          summary_only     => false,
+          suppress_filter  => 'SUPRESS1',
+        }
+          
+        mikrotik_bgp_aggregate { '1.2.0.0/16': 
+          ensure             => disabled,
+          instance           => 'PUPPET',
+          inherit_attributes => true,
+          suppress_filter    => 'SUPRESSNEW',
+        }
+          
+        mikrotik_bgp_aggregate { '1.3.0.0/16': 
+          ensure           => enabled,
+          instance         => 'PUPPET',
+          include_igp      => false,
+          advertise_filter => 'ADVNEW',
+          suppress_filter  => 'SUPRESS3',
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+  
+  context "remove BGP aggregate" do
+    it 'should update master' do
+      site_pp = <<-EOS  
+        mikrotik_bgp_aggregate { '1.1.0.0/16': 
+          ensure => absent,
+        }
+          
+        mikrotik_bgp_aggregate { '1.2.0.0/16': 
+          ensure => absent,
+        }
+          
+        mikrotik_bgp_aggregate { '1.3.0.0/16': 
+          ensure => absent,
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+  
+  context "create BGP network" do
+    it 'should update master' do
+      site_pp = <<-EOS  
+        mikrotik_bgp_network { '1.1.1.0/24': 
+          
+        }
+        
+        mikrotik_bgp_network { '1.1.2.0/24': 
+          ensure      => present,
+          synchronize => false,
+        }
+        
+        mikrotik_bgp_network { '1.1.3.0/24': 
+          ensure => enabled,  
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+  
+  context "update BGP network" do
+    it 'should update master' do
+      site_pp = <<-EOS  
+        mikrotik_bgp_network { '1.1.2.0/24': 
+          synchronize => true,
+        } 
+        
+        mikrotik_bgp_network { '1.1.3.0/24': 
+          ensure => disabled,
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+  
+  context "remove BGP network" do
+    it 'should update master' do
+      site_pp = <<-EOS  
+        mikrotik_bgp_network { '1.1.1.0/24': 
+          ensure => absent,
+        }
+        
+        mikrotik_bgp_network { '1.1.2.0/24': 
+          ensure => absent,
+        }
+        
+        mikrotik_bgp_network { '1.1.3.0/24': 
+          ensure => absent,
         }
       EOS
       

@@ -4,6 +4,29 @@ describe '/ip/service' do
   before { skip("Skipping this test for now") }
   
   include_context 'testnodes defined'
+
+  context "reset configuration" do      
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_ip_service { 'telnet':
+          ensure => 'disabled',
+        }
+        mikrotik_ip_service { 'api-ssl':
+          ensure => 'enabled',
+        }
+        mikrotik_ip_service { 'www':
+          addresses => [],
+        }
+        mikrotik_ip_service { 'ftp':
+          port => 21,
+        }  
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run after failures', 1
+  end  
   
   context "valid changes" do
     it 'should update master' do
@@ -41,16 +64,4 @@ describe '/ip/service' do
   
     it_behaves_like 'an idempotent device run'
   end
-  
-#  context "b" do
-#    it 'should update master' do
-#      site_pp = <<-EOS
-#
-#      EOS
-#      
-#      set_site_pp_on_master(site_pp)
-#    end
-#  
-#    it_behaves_like 'a faulty device run'
-#  end
 end

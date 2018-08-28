@@ -5,6 +5,20 @@ describe '/ip settings' do
   
   include_context 'testnodes defined'
 
+  context "reset configuration" do      
+    it 'should update master' do
+      site_pp = <<-EOS            
+        mikrotik_ip_settings { 'ip':
+          rp_filter => 'no',
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+ 
+    it_behaves_like 'an idempotent device run after failures', 1
+  end  
+
   context "rp-filter=loose" do
     it 'should update master' do
       site_pp = <<-EOS                

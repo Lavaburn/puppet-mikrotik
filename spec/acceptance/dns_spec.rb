@@ -4,6 +4,21 @@ describe '/ip/dns' do
   before { skip("Skipping this test for now") }
   
   include_context 'testnodes defined'
+
+  context "reset configuration" do      
+    it 'should update master' do
+      site_pp = <<-EOS
+      mikrotik_dns { 'dns':
+        servers               => ['8.8.8.8','8.8.4.4'],
+        allow_remote_requests => false,
+      }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run after failures', 1
+  end  
   
   context "correct settings" do
     it 'should update master' do

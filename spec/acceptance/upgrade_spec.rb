@@ -9,13 +9,25 @@ describe '/system/upgrade' do
     # Upgrade Source
     @upgrade_source = get_upgrade_source
   end 
+
+  context "reset configuration" do      
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_upgrade_source { '#{@upgrade_source[:hostname]}':
+          ensure => absent,
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run after failures', 1
+  end  
   
   # Package Source
-  context "add package source" do      
-#    before { skip("Skipping this test for now") }
-      
+  context "add package source" do            
     it 'should update master' do
-      site_pp = <<-EOS            
+      site_pp = <<-EOS                  
         mikrotik_upgrade_source { '#{@upgrade_source[:hostname]}':
           username => 'testuser',
           password => '#{@upgrade_source[:password]}',
@@ -28,11 +40,9 @@ describe '/system/upgrade' do
     it_behaves_like 'an idempotent device run'
   end
 
-  context "update package source" do      
-#    before { skip("Skipping this test for now") }
-      
+  context "update package source" do            
     it 'should update master' do
-      site_pp = <<-EOS            
+      site_pp = <<-EOS                      
         mikrotik_upgrade_source { '#{@upgrade_source[:hostname]}':
           username => '#{@upgrade_source[:username]}',
           password => 'unchanged',
@@ -47,8 +57,6 @@ describe '/system/upgrade' do
 
   # Sanity Check
   context "wrong package" do      
-#    before { skip("Skipping this test for now") }   # OK
-      
     it 'should update master' do
       site_pp = <<-EOS            
         mikrotik_upgrade { '8.0.1':
@@ -63,8 +71,6 @@ describe '/system/upgrade' do
   end
 
   context "package present" do      
-#    before { skip("Skipping this test for now") }   # OK
-    
     it 'should update master' do
       site_pp = <<-EOS            
         mikrotik_upgrade { '#{@upgrade_source[:version1]}':
@@ -79,8 +85,6 @@ describe '/system/upgrade' do
   end
 
   context "package absent" do      
-#    before { skip("Skipping this test for now") }   # OK
-    
     it 'should update master' do
       site_pp = <<-EOS            
         mikrotik_upgrade { '8.0.1':
@@ -94,9 +98,7 @@ describe '/system/upgrade' do
     it_behaves_like 'an empty device run'
   end
 
-  context "package removal" do      
-#    before { skip("Skipping this test for now") }   # OK
-    
+  context "package removal" do
     it 'should update master' do
       site_pp = <<-EOS            
         mikrotik_upgrade { '#{@upgrade_source[:version1]}':
@@ -112,7 +114,7 @@ describe '/system/upgrade' do
 
   # Action: Download + Reboot
   context "install package and reboot" do      
-#    before { skip("Skipping this test for now") }   # OK
+    # before { skip("Skipping this test for now") }
     
     it 'should update master' do
       site_pp = <<-EOS            
@@ -128,9 +130,9 @@ describe '/system/upgrade' do
     it_behaves_like 'an idempotent device run'
   end
   
-  context "download installed package" do      
-#    before { skip("Skipping this test for now") }
-      
+  context "download installed package" do     
+    # before { skip("Skipping this test for now") }
+     
     it 'should update master' do
       site_pp = <<-EOS            
         mikrotik_upgrade { '#{@upgrade_source[:version2]}':
@@ -145,9 +147,7 @@ describe '/system/upgrade' do
   end
   
   # Action: Download and forget forced reboot
-  context "download package" do      
-#    before { skip("Skipping this test for now") }   # OK
-    
+  context "download package" do          
     it 'should update master' do
       site_pp = <<-EOS            
         mikrotik_upgrade { '#{@upgrade_source[:version1]}':
@@ -162,8 +162,6 @@ describe '/system/upgrade' do
   end
   
   context "install package without force" do      
-#    before { skip("Skipping this test for now") }   # OK
-      
     it 'should update master' do
       site_pp = <<-EOS            
         mikrotik_upgrade { '#{@upgrade_source[:version1]}':
@@ -179,8 +177,6 @@ describe '/system/upgrade' do
   
   # Package Source Cleanup
   context "remove package source" do
-#    before { skip("Skipping this test for now") }
-      
     it 'should update master' do
       site_pp = <<-EOS            
         mikrotik_upgrade_source { '#{@upgrade_source[:hostname]}':

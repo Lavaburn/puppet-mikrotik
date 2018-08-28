@@ -4,6 +4,32 @@ describe '/ip/route' do
   before { skip("Skipping this test for now") }
   
   include_context 'testnodes defined'
+
+  context "reset configuration" do      
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_ip_route { ['test_route1', 'test_route2']:
+          ensure => absent,
+        }
+    
+        mikrotik_ip_route_rule { ['test_rule1', 'test_rule2']:
+          ensure => absent,
+        }
+                  
+        mikrotik_ip_route_vrf { 'VRF_1001':
+          ensure => absent,
+        }
+  
+        mikrotik_interface_vlan { 'VRF_VLAN1001':
+          ensure => absent,          
+        }        
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run after failures', 4
+  end  
   
   context "create ip routes" do
     it 'should update master' do
@@ -16,6 +42,7 @@ describe '/ip/route' do
         }  
         
         mikrotik_ip_route { 'test_route2':
+          ensure      => disabled,
           dst_address => '172.22.1.0/24',
           type        => 'blackhole',
         }
@@ -34,7 +61,12 @@ describe '/ip/route' do
           dst_address   => '172.22.0.0/24',
           distance      => 60,
           check_gateway => ping,
-        }          
+        }     
+          
+        mikrotik_ip_route { 'test_route2':
+          ensure      => enabled,
+          dst_address => '172.22.1.0/24',
+        }     
       EOS
       
       set_site_pp_on_master(site_pp)
@@ -47,12 +79,14 @@ describe '/ip/route' do
     it 'should update master' do
       site_pp = <<-EOS      
         mikrotik_ip_route_rule { 'test_rule1':
+          ensure      => disabled,
           src_address => '172.24.0.0/24',
           dst_address => '172.24.1.0/24',     
           action      => unreachable,
         }   
         
         mikrotik_ip_route_rule { 'test_rule2':
+          ensure       => enabled,
           routing_mark => 'ROUTE_TABLE1',
           interface    => 'ether1',     
           action       => lookup,
@@ -66,6 +100,20 @@ describe '/ip/route' do
     it_behaves_like 'an idempotent device run'
   end
 
+  context "enable ip route rule" do
+    it 'should update master' do
+      site_pp = <<-EOS      
+        mikrotik_ip_route_rule { 'test_rule1':
+          ensure => enabled,
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+  
   context "create ip route vrf" do
     it 'should update master' do
       site_pp = <<-EOS
@@ -75,7 +123,22 @@ describe '/ip/route' do
         }
       
         mikrotik_ip_route_vrf { 'VRF_1001':
+          ensure     => enabled,
           interfaces => 'VRF_VLAN1001'
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+
+  context "disable ip route vrf" do
+    it 'should update master' do
+      site_pp = <<-EOS      
+      mikrotik_ip_route_vrf { 'VRF_1001':
+          ensure => disabled,
         }
       EOS
       
@@ -90,10 +153,32 @@ describe '/routing/filter' do
   before { skip("Skipping this test for now") }
   
   include_context 'testnodes defined'
+
+  context "reset configuration" do      
+    it 'should update master' do
+      site_pp = <<-EOS        
+        mikrotik_routing_filter { ['test_filter1', 'test_filter2', 'test_filter3']:
+          ensure => absent,          
+        }
+                
+        mikrotik_routing_filter { ['filter_chain2', 'filter_chain3', 'filter_chain4']:
+          ensure => absent,          
+        }
+      
+        mikrotik_routing_filter { ['filter_a', 'filter_b', 'filter_c', 'filter_d', 'filter_e', 'filter_f', 'filter_g', 'filter_h', 'filter_i']:
+          ensure => absent,          
+        }
+        
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run after failures', 4
+  end  
+  
   
   context "create new filter" do
-    before { skip("Skipping this test for now") }
-
     it 'should update master' do
       site_pp = <<-EOS   
         mikrotik_routing_filter { 'test_filter1':
@@ -106,6 +191,7 @@ describe '/routing/filter' do
         }
         
         mikrotik_routing_filter { 'test_filter2':
+          ensure       => enabled,
           chain        => 'BGP_IN_TEST2',        
           action       => 'jump',  
           jump_target  => 'test_filter3',
@@ -113,6 +199,7 @@ describe '/routing/filter' do
         }     
         
         mikrotik_routing_filter { 'test_filter3':
+          ensure                 => disabled,
           chain                  => 'BGP_OUT_TEST3',
           protocols              => ['bgp'], 
           bgp_communities        => ['62123:20000', '62123:10000'],
@@ -122,6 +209,26 @@ describe '/routing/filter' do
           set_bgp_prepend        => 3,   
           set_bgp_med            => 50,                   
           append_bgp_communities => ['62124:30000'],
+        }              
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+  
+  context "enable/disable filter" do
+    it 'should update master' do
+      site_pp = <<-EOS   
+        mikrotik_routing_filter { 'test_filter2':
+          ensure => disabled,
+          chain  => 'BGP_IN_TEST2',        
+        }             
+         
+        mikrotik_routing_filter { 'test_filter3':
+          ensure => enabled,
+          chain  => 'BGP_OUT_TEST3',
         }              
       EOS
       

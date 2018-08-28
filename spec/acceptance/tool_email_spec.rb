@@ -5,6 +5,21 @@ describe '/tool/e-mail' do
   
   include_context 'testnodes defined'
 
+  context "reset configuration" do      
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_tool_email { 'email':
+          server       => '0.0.0.0',
+          from_address => '<>',
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run after failures', 1
+  end  
+
   context "with valid settings" do
     it 'should update master' do
       site_pp = <<-EOS

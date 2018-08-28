@@ -5,6 +5,34 @@ describe '/ppp' do
   
   include_context 'testnodes defined'
 
+  context "reset configuration" do      
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_ppp_aaa { 'aaa':
+          use_radius     => false,
+          accounting     => false,
+          interim_update => '1m',
+        }
+  
+        mikrotik_ppp_profile { ['profile1', 'profile2']:
+          ensure => absent,
+        }
+                  
+        mikrotik_ppp_server { ['pptp', 'l2tp']:
+          ensure => 'disabled',          
+        }
+        
+        mikrotik_ppp_secret  { ['ppp_user1', 'ppp_user2']:
+          ensure => absent,
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run after failures', 4
+  end  
+  
   context "create ppp profiles" do
     it 'should update master' do
       site_pp = <<-EOS
@@ -80,7 +108,7 @@ describe '/ppp' do
   context "with wrong title" do
     it 'should update master' do
       site_pp = <<-EOS
-        mikrotik_user_aaa { 'myAAA2':
+        mikrotik_ppp_aaa { 'myAAA2':
           use_radius     => true,
           interim_update => '10m',
         }
@@ -155,10 +183,11 @@ describe '/ppp' do
           service        => 'any',
           profile        => 'profile1',
           local_address  => '192.168.10.1',  
-          remote_address => '192.168.10.2',   
+          remote_address => '192.168.10.2',      
         }
         
         mikrotik_ppp_secret  { 'ppp_user2':
+          ensure         => 'disabled',
           password       => 'password',
           service        => 'pptp',
           routes         => ['192.168.11.0/24', '192.168.12.0/24'],

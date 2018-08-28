@@ -4,6 +4,29 @@ describe '/snmp' do
   before { skip("Skipping this test for now") }
   
   include_context 'testnodes defined'
+
+  context "reset configuration" do      
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_snmp { 'snmp':
+          ensure          => disabled,
+          contact         => "",
+          location        => "",
+          trap_version    => 1,
+          trap_community  => "public",
+          trap_generators => [],
+          trap_targets    => [],
+        }
+        mikrotik_snmp_community { ['test_ro', 'test_rw']:
+          ensure => absent,
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run after failures', 2
+  end  
   
   context "snmp normal config" do
     it 'should update master' do

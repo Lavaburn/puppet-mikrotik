@@ -5,6 +5,37 @@ describe '/user' do
   
   include_context 'testnodes defined'
 
+  context "reset configuration" do      
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_user_aaa { 'aaa':
+          use_radius     => false,
+          accounting     => false,
+          interim_update => '1m',
+          default_group  => 'read',
+          exclude_groups => []
+        }
+        
+        mikrotik_user { 'testuser1':
+          ensure => absent,
+        }
+        
+        mikrotik_user_group { ['admin1', 'admin2']:
+          ensure => absent,
+        }
+             
+        # TODO
+        # mikrotik_user_sshkey { 'testuser1':
+        #   ensure => absent,
+        # }      
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run after failures', 3
+  end  
+  
   context "create user groups" do
     it 'should update master' do
       site_pp = <<-EOS
@@ -75,6 +106,7 @@ describe '/user' do
     it 'should update master' do
       site_pp = <<-EOS
         mikrotik_user { 'testuser1':
+          ensure    => disabled,
           password  => 'password',
           group     => 'admin1',
           addresses => ['192.168.0.0/24'],
@@ -96,6 +128,7 @@ describe '/user' do
     it 'should update master' do
       site_pp = <<-EOS
         mikrotik_user { 'testuser1':
+          ensure    => enabled,
           password  => 'password2',
           group     => 'admin2',
           addresses => ['192.168.0.0/24', '192.168.1.0/24'],

@@ -1,7 +1,10 @@
 Puppet::Type.newtype(:mikrotik_logging_action) do
   apply_to_all
-  
-  ensurable
+
+  ensurable do
+    defaultvalues
+    defaultto :present
+  end
   
   newparam(:name) do
     desc 'Logging action name'

@@ -146,7 +146,7 @@ class Puppet::Provider::Mikrotik_Api < Puppet::Provider
     #Puppet.debug("simple_flush(#{path}, #{params.inspect}, #{lookup.inspect})")
     
     # create
-    if @property_flush[:ensure] == :present
+    if @property_flush[:ensure] == :present and @original_values.empty?
       Puppet.debug("Creating #{path}")
       
       result = Puppet::Provider::Mikrotik_Api::add(path, params)
@@ -164,7 +164,7 @@ class Puppet::Provider::Mikrotik_Api < Puppet::Provider
     end      
     
     # update
-    if @property_flush.empty?
+    if ! @original_values.empty?
       Puppet.debug("Updating #{path}")
         
       id_list = Puppet::Provider::Mikrotik_Api::lookup_id(path, lookup)

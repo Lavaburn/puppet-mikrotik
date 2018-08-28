@@ -4,6 +4,23 @@ describe '/mpls' do
   before { skip("Skipping this test for now") }
   
   include_context 'testnodes defined'
+
+  context "reset configuration" do      
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_mpls_ldp { 'ldp':
+          ensure            => disabled,
+          lsr_id            => '0.0.0.0',
+          transport_address => '0.0.0.0',
+          loop_detect       =>  false,
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run after failures', 1
+  end  
   
   context "update ldp" do
     it 'should update master' do

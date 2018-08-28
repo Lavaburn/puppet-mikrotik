@@ -5,16 +5,43 @@ describe '/routing/ospf' do
   
   include_context 'testnodes defined'
 
+  context "reset configuration" do      
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_ospf_interface { 'ether1':
+          ensure => absent,        
+        }
+        
+        mikrotik_ospf_network { '9.8.7.6/32':
+          ensure => absent,        
+        }
+          
+        mikrotik_ospf_area { 'BORDER3':
+          ensure => absent,        
+        }
+        
+        mikrotik_ospf_instance { 'PUPPET':
+          ensure => absent,        
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run after failures', 4
+  end  
+
   context "instance creation" do
     it 'should update master' do
       site_pp = <<-EOS  
-        mikrotik_ospf_instance { 'RCS':
-          router_id              => '105.235.209.44',
+        mikrotik_ospf_instance { 'PUPPET':
+          ensure                 => disabled,
+          router_id              => '9.8.7.6',
           distribute_default     => 'always-as-type-1',
           redistribute_connected => 'as-type-2',
           redistribute_static    => 'as-type-2',
-          out_filter             => 'RCS_PEER_OUT',
-          in_filter              => 'RCS_PEER_IN',
+          out_filter             => 'PUPPET_PEER_OUT',
+          in_filter              => 'PUPPET_PEER_IN',
           metric_connected       => 100,
         }
       EOS
@@ -28,7 +55,8 @@ describe '/routing/ospf' do
   context "instance update" do
     it 'should update master' do
       site_pp = <<-EOS  
-        mikrotik_ospf_instance { 'RCS':
+        mikrotik_ospf_instance { 'PUPPET':
+          ensure                 => enabled,
           distribute_default     => 'if-installed-as-type-1',
           redistribute_connected => 'as-type-1',
           redistribute_static    => 'as-type-1',
@@ -47,7 +75,7 @@ describe '/routing/ospf' do
       site_pp = <<-EOS  
         mikrotik_ospf_area { 'BORDER3':
           area_id  => '0.0.1.63',
-          instance => 'RCS',
+          instance => 'PUPPET',
         }
       EOS
       
@@ -62,7 +90,7 @@ describe '/routing/ospf' do
       site_pp = <<-EOS  
         mikrotik_ospf_area { 'BORDER3':
           area_id  => '0.0.0.63',
-          instance => 'RCS',
+          instance => 'PUPPET',
         }
       EOS
       
@@ -75,7 +103,7 @@ describe '/routing/ospf' do
   context "network creation" do
     it 'should update master' do
       site_pp = <<-EOS  
-        mikrotik_ospf_network { '105.235.209.44/32':
+        mikrotik_ospf_network { '9.8.7.6/32':
           area  => 'backbone',
         }
       EOS
@@ -89,7 +117,7 @@ describe '/routing/ospf' do
   context "network update" do
     it 'should update master' do
       site_pp = <<-EOS  
-        mikrotik_ospf_network { '105.235.209.44/32':
+        mikrotik_ospf_network { '9.8.7.6/32':
           area  => 'BORDER3',
         }
       EOS

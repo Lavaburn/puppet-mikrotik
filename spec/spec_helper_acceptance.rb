@@ -4,6 +4,7 @@ require 'support/changing_device_run'
 require 'support/empty_device_run'
 require 'support/faulty_device_run'
 require 'support/idempotent_device_run'
+require 'support/idempotent_device_run_after_failures'
 require 'support/idempotent_manifest'
 require 'support/testnodes'
 

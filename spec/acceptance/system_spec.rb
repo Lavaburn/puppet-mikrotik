@@ -5,6 +5,32 @@ describe '/system' do
   
   include_context 'testnodes defined'
 
+  context "reset configuration" do      
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_system { 'system':
+          identity      => 'mikrotik',
+          timezone      => 'Europe/Brussels',
+          ntp_enabled   => false,
+          ntp_primary   => '193.190.147.153',
+          ntp_secondary => '195.200.224.66',
+        }   
+        
+        mikrotik_script { 'script1': 
+          ensure => absent,
+        }
+      
+        mikrotik_schedule { 'daily_run_script1': 
+          ensure => absent,
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run after failures', 3
+  end  
+
   context "correct settings" do
     it 'should update master' do
       site_pp = <<-EOS            
@@ -50,6 +76,7 @@ describe '/system' do
         }
       
         mikrotik_schedule { 'daily_run_script1': 
+          ensure   => disabled,
           interval => '1h',
           policies => ['read'],
           on_event => 'script1',
@@ -71,6 +98,7 @@ describe '/system' do
         }
       
         mikrotik_schedule { 'daily_run_script1': 
+          ensure   => enabled,
           interval => '1d',
           policies => ['read', 'write'],
         }

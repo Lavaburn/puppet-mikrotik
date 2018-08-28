@@ -25,7 +25,7 @@ Puppet::Type.type(:mikrotik_dhcp_server).provide(:mikrotik_api, :parent => Puppe
     else
       state = :enabled
     end
-    
+        
     new(
       :ensure           => :present,
       :state            => state,
@@ -40,9 +40,9 @@ Puppet::Type.type(:mikrotik_dhcp_server).provide(:mikrotik_api, :parent => Puppe
       :authoritative    => data['authoritative'],
       :bootp_support    => data['bootp-support'],
       :lease_script     => data['lease-script'],
-      :add_arp          => data['add-arp'],
-      :always_broadcast => data['always-broadcast'],
-      :use_radius       => data['use-radius']
+      :add_arp          => (data['add-arp'].nil? ? :false : data['add-arp']),
+      :always_broadcast => (data['always-broadcast'].nil? ? :false : data['always-broadcast']),
+      :use_radius       => (data['use-radius'].nil? ? :false : data['use-radius'])
     )
   end
 
@@ -68,9 +68,10 @@ Puppet::Type.type(:mikrotik_dhcp_server).provide(:mikrotik_api, :parent => Puppe
     params["authoritative"] = resource[:authoritative] if !resource[:authoritative].nil?
     params["bootp-support"] = resource[:bootp_support] if !resource[:bootp_support].nil?
     params["lease-script"] = resource[:lease_script] if !resource[:lease_script].nil?
-    params["add-arp"] = resource[:add_arp] if !resource[:add_arp].nil?
-    params["always-broadcast"] = resource[:always_broadcast] if !resource[:always_broadcast].nil?
-    params["use-radius"] = resource[:use_radius] if !resource[:use_radius].nil?
+      
+    params["add-arp"] = Puppet::Provider::Mikrotik_Api::convertBoolToYesNo(resource[:add_arp]) if ! resource[:add_arp].nil?
+    params["always-broadcast"] = Puppet::Provider::Mikrotik_Api::convertBoolToYesNo(resource[:always_broadcast]) if ! resource[:always_broadcast].nil?
+    params["use-radius"] = Puppet::Provider::Mikrotik_Api::convertBoolToYesNo(resource[:use_radius]) if ! resource[:use_radius].nil?
 
     lookup = {}
     lookup["name"] = resource[:name]

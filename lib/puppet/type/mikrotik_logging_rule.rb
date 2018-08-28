@@ -1,7 +1,10 @@
 Puppet::Type.newtype(:mikrotik_logging_rule) do
   apply_to_all
-  
-  ensurable
+
+  ensurable do
+    defaultvalues
+    defaultto :present
+  end
   
   newparam(:name) do
     desc 'Mikrotik does not have a title ID for this object. Restricted to topic1,topic2_action'

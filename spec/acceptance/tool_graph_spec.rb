@@ -5,6 +5,28 @@ describe '/tool/graphing' do
   
   include_context 'testnodes defined'
 
+  context "reset configuration" do      
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_graph_interface { 'all':
+          ensure => absent,
+        }
+        
+        mikrotik_graph_resource { 'resource':
+          ensure => absent,
+        }
+        
+        mikrotik_graph_queue { 'all':
+          ensure => absent,
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run after failures', 3
+  end  
+
   context "interface" do
     it 'should update master' do
       site_pp = <<-EOS  
