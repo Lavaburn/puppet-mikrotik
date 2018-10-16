@@ -19,11 +19,11 @@ Puppet::Type.type(:mikrotik_mpls_ldp_interface).provide(:mikrotik_api, :parent =
     instances
   end
   
-  def self.mplsLdpInterface(data)
-    if data['enabled'] == "true"
-      state = :enabled
-    else
+  def self.mplsLdpInterface(data)    
+    if data['disabled'] == "true"
       state = :disabled
+    else
+      state = :enabled
     end
     
     new(
