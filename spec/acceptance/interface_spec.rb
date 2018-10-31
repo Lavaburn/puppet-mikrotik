@@ -39,12 +39,16 @@ describe '/interface' do
         mikrotik_interface_list { 'interface_list_1':
           ensure => 'absent',
         }
+        
+        mikrotik_interface_bgp_vpls { 'Virtual1':
+          ensure => 'absent',
+        }
       EOS
       
       set_site_pp_on_master(site_pp)
     end
   
-    it_behaves_like 'an idempotent device run after failures', 8
+    it_behaves_like 'an idempotent device run after failures', 9
   end  
   
   context "create new bridge" do      
@@ -182,6 +186,24 @@ describe '/interface' do
     it_behaves_like 'an idempotent device run'
   end
 
+  context "create vpls bgp interface" do      
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_interface_bgp_vpls { 'Virtual1':
+          route_distinguisher  => '1234:54321',            
+          import_route_targets => ['1234:54321', '1234:54322'],
+          export_route_targets => '1234:54321',                  
+          site_id              => 1,
+          bridge               => 'br0',
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+
   context "rename ethernet" do      
     it 'should update master' do
       site_pp = <<-EOS
@@ -238,6 +260,22 @@ describe '/interface' do
   
     it_behaves_like 'an idempotent device run'
   end
+
+  context "update vpls bgp interface" do      
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_interface_bgp_vpls { 'Virtual1':  
+          import_route_targets => ['1234:54322', '1234:54323'],
+          export_route_targets => '1234:54322',                  
+          bridge_cost          => 100,
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
   
   context "disable some interfaces" do      
     it 'should update master' do
@@ -259,6 +297,10 @@ describe '/interface' do
         }
         
         mikrotik_interface_bond { 'ip_tnl_bond':   
+          ensure => disabled
+        }
+          
+        mikrotik_interface_bgp_vpls { 'Virtual1':
           ensure => disabled
         }
       EOS
@@ -289,6 +331,10 @@ describe '/interface' do
         }
         
         mikrotik_interface_bond { 'ip_tnl_bond':   
+          ensure => enabled
+        }
+          
+        mikrotik_interface_bgp_vpls { 'Virtual1':
           ensure => enabled
         }
       EOS

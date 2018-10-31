@@ -19,6 +19,10 @@ describe '/routing/ospf' do
         mikrotik_ospf_area { 'BORDER3':
           ensure => absent,        
         }
+    
+        mikrotik_ospf_nmba_neighbor { '1.2.3.4':
+          ensure => absent,
+        }
         
         mikrotik_ospf_instance { 'PUPPET':
           ensure => absent,        
@@ -28,7 +32,7 @@ describe '/routing/ospf' do
       set_site_pp_on_master(site_pp)
     end
   
-    it_behaves_like 'an idempotent device run after failures', 4
+    it_behaves_like 'an idempotent device run after failures', 6
   end  
 
   context "instance creation" do
@@ -157,4 +161,47 @@ describe '/routing/ospf' do
   
     it_behaves_like 'an idempotent device run'
   end
+
+  context "neighbor creation" do
+    it 'should update master' do
+      site_pp = <<-EOS  
+        mikrotik_ospf_nmba_neighbor { '1.2.3.4':
+          instance => 'PUPPET',
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+
+  context "neighbor update" do
+    it 'should update master' do
+      site_pp = <<-EOS  
+        mikrotik_ospf_nmba_neighbor { '1.2.3.4':
+          poll_interval => '5m',
+          priority      => 100,
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+
+  context "neighbor disable" do
+    it 'should update master' do
+      site_pp = <<-EOS      
+        mikrotik_ospf_nmba_neighbor { '1.2.3.4':
+          ensure => disabled,
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end  
 end
