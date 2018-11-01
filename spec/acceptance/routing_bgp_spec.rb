@@ -1,7 +1,7 @@
 require 'spec_helper_acceptance'
 
 describe '/routing/bgp' do
-  before { skip("Skipping this test for now") }
+  #before { skip("Skipping this test for now") }
   
   include_context 'testnodes defined'
 
@@ -28,7 +28,7 @@ describe '/routing/bgp' do
       set_site_pp_on_master(site_pp)
     end
   
-    it_behaves_like 'an idempotent device run after failures', 2
+    it_behaves_like 'an idempotent device run after failures', 4
   end  
 
   context "instance creation" do
@@ -66,7 +66,7 @@ describe '/routing/bgp' do
     it_behaves_like 'an idempotent device run'
   end
     
-  context "peers creation" do
+  context "create peer" do
     it 'should update master' do
       site_pp = <<-EOS  
         mikrotik_bgp_peer { 'peer1':
@@ -87,7 +87,7 @@ describe '/routing/bgp' do
     it_behaves_like 'an idempotent device run'
   end
     
-  context "peers update" do
+  context "update peer 1" do
     it 'should update master' do
       site_pp = <<-EOS  
         mikrotik_bgp_peer { 'peer1':
@@ -96,6 +96,59 @@ describe '/routing/bgp' do
           in_filter          => 'PUPPET_PEER_IN2',
           route_reflect      =>  false,
           default_originate  => 'if-installed',
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+
+  context "update peer 2" do
+    it 'should update master' do
+      site_pp = <<-EOS  
+        mikrotik_bgp_peer { 'peer1':
+          nexthop_choice  => 'force-self',
+          multihop        => true,
+          route_reflect   => false,
+          passive         => true,
+          source          => 'ether1',            
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+
+  context "update peer 3" do
+    it 'should update master' do
+      site_pp = <<-EOS  
+        mikrotik_bgp_peer { 'peer1':
+          nexthop_choice    => 'propagate',
+          multihop          => false,
+          route_reflect     => true,
+          remove_private_as => true,
+          as_override       => true,
+          use_bfd           => true,
+          address_families  => ['ip', 'l2vpn'],
+          comment           => 'VPLS peer',
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+  
+  context "disable peer" do
+    it 'should update master' do
+      site_pp = <<-EOS  
+        mikrotik_bgp_peer { 'peer1':
+          ensure => disabled,
         }
       EOS
       
