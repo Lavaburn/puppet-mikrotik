@@ -1,13 +1,18 @@
 require 'spec_helper_acceptance'
 
 describe '/routing/bgp' do
-  #before { skip("Skipping this test for now") }
+  before { skip("Skipping this test for now") }
   
   include_context 'testnodes defined'
 
   context "reset configuration" do      
     it 'should update master' do
-      site_pp = <<-EOS
+      site_pp = <<-EOS        
+        mikrotik_bgp_instance_vrf { 'VIRTUAL1':
+          instance => 'PUPPET',# Always required...
+          ensure   => absent,
+        }
+        
         mikrotik_bgp_instance { 'PUPPET':
           ensure => absent,
         }
@@ -28,7 +33,7 @@ describe '/routing/bgp' do
       set_site_pp_on_master(site_pp)
     end
   
-    it_behaves_like 'an idempotent device run after failures', 4
+    it_behaves_like 'an idempotent device run after failures', 5
   end  
 
   context "instance creation" do
@@ -303,4 +308,54 @@ describe '/routing/bgp' do
   
     it_behaves_like 'an idempotent device run'
   end
+    
+  context "create BGP instance VRF" do
+    it 'should update master' do
+      site_pp = <<-EOS  
+        mikrotik_bgp_instance_vrf { 'VIRTUAL1':
+          instance               => 'PUPPET',# Always required...
+          ensure                 => 'disabled',
+          redistribute_connected => true,
+          redistribute_static    => true,
+        }
+        
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+  
+  context "update BGP instance VRF" do
+    it 'should update master' do
+      site_pp = <<-EOS  
+        mikrotik_bgp_instance_vrf { 'VIRTUAL1':
+          instance             => 'PUPPET',
+          redistribute_static  => false,
+          redistribute_bgp     => true,
+          in_filter            => 'FILTER1',
+        }        
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+  
+  context "enable BGP instance VRF" do
+    it 'should update master' do
+      site_pp = <<-EOS  
+        mikrotik_bgp_instance_vrf { 'VIRTUAL1':
+          instance => 'PUPPET',# Always required...
+          ensure   => 'enabled',
+        }        
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end  
 end
