@@ -24,7 +24,8 @@ class AirspanDB {
   }
   
   public function verifyConfig() {    
-    $this->stats["cpe_online"] = count($this->msConfig);
+    //$this->stats["cpe_online"] = count($this->msConfig);
+  	$this->stats["cpe_online"] = count($this->msRfStats);
     
     $msVlanList = $this->syncCpeConfig();
     $this->msRemoval();
@@ -50,7 +51,10 @@ class AirspanDB {
   	$now = date("Y-m-d H:i:s");
   	
   	$msVlanList = array();
-  	foreach ($this->msConfig as $mac => $config) {  		
+  	//foreach ($this->msConfig as $mac => $config) {  	
+  	foreach (array_keys($this->msRfStats) as $mac) {	// Only CURRENTLY ACTIVE CPEs !
+  		$config = $this->msConfig[$mac];
+  		
   		$cpeUpdated = false;
   		$cpes = $this->getCpes($mac);
   		if (count($cpes) == 0) {
