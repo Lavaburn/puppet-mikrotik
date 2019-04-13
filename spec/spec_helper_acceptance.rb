@@ -1,4 +1,13 @@
+require 'puppet'
+
 require 'beaker-rspec'
+require 'beaker-rspec/spec_helper'
+require 'beaker-rspec/helpers/serverspec'
+
+require 'beaker-puppet'
+
+require 'beaker'
+require 'beaker/puppet_install_helper'
 
 require 'support/changing_device_run'
 require 'support/empty_device_run'
@@ -14,7 +23,11 @@ RSpec.configure do |c|
     @testnodes = get_testnodes
     
     proj_root = File.expand_path(File.join(File.dirname(__FILE__), '..'))
-    
+      
+    # Install the correct Puppet version
+    run_puppet_install_helper("agent", "5.5.10")
+    # FAILS: run_puppet_install_helper("agent", "6.2.0")
+      
     # Generic for every host    
     hosts.each do |host|
       # Install this module
@@ -73,7 +86,7 @@ def run_puppet_device_on(devices)
   end
   
   devices.each do |device| 
-    @result = on(device, "puppet device --detailed-exitcodes #{debug}", :accept_all_exit_codes => true)
+    @result = on(device, "/opt/puppetlabs/puppet/bin/puppet device --detailed-exitcodes #{debug}", :accept_all_exit_codes => true)
   end
   
   @result
