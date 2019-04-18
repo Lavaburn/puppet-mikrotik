@@ -19,6 +19,12 @@ For local testing using RVM:
 * cd vagrant; vagrant up
 See spec/fixtures/testnodes.example.yaml
 
+#### IPv6
+The IPv6 package is not installed by default!
+
+TODO !!!
+
+
 ### Tested Using
 Works:
 * Ruby 2.1.8

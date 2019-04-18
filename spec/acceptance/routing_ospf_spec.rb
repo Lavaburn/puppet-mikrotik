@@ -205,3 +205,145 @@ describe '/routing/ospf' do
     it_behaves_like 'an idempotent device run'
   end  
 end
+
+describe '/routing/ospfv3' do
+  before { skip("Skipping this test for now") }
+  
+  include_context 'testnodes defined'
+
+  context "reset configuration" do      
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_ospfv3_interface { 'ether1':
+          ensure => absent,        
+        }
+                  
+        mikrotik_ospfv3_area { 'BORDER3':
+          ensure => absent,        
+        }
+
+        mikrotik_ospfv3_instance { 'PUPPET':
+          ensure => absent,        
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run after failures', 1
+  end  
+
+  context "instance creation" do
+    it 'should update master' do
+      site_pp = <<-EOS  
+        mikrotik_ospfv3_instance { 'PUPPET':
+          ensure                 => disabled,
+          router_id              => '9.8.7.6',
+          distribute_default     => 'always-as-type-1',
+          redistribute_connected => 'as-type-2',
+          redistribute_static    => 'as-type-2',
+          metric_connected       => 100,
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+
+  context "instance update" do
+    it 'should update master' do
+      site_pp = <<-EOS  
+        mikrotik_ospfv3_instance { 'PUPPET':
+          ensure                 => enabled,
+          distribute_default     => 'if-installed-as-type-1',
+          redistribute_connected => 'as-type-1',
+          redistribute_static    => 'as-type-1',
+          metric_connected       => 50,
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+    
+  context "area creation" do
+    it 'should update master' do
+      site_pp = <<-EOS  
+        mikrotik_ospfv3_area { 'BORDER3':
+          area_id  => '0.0.1.63',
+          instance => 'PUPPET',
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+
+  context "area update" do
+    it 'should update master' do
+      site_pp = <<-EOS  
+        mikrotik_ospfv3_area { 'BORDER3':
+          area_id  => '0.0.0.63',
+          instance => 'PUPPET',
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+  
+  context "interface creation" do
+    it 'should update master' do
+      site_pp = <<-EOS  
+        mikrotik_ospfv3_interface { 'ether1':
+          area     => 'BORDER3',
+          cost     => 100,
+          priority => 20,
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+
+  context "interface update" do
+    it 'should update master' do
+      site_pp = <<-EOS  
+        mikrotik_ospfv3_interface { 'ether1':
+          area     => 'BORDER3',
+          cost     => 10,
+          priority => 200,
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+  
+  context "interface disable" do
+    it 'should update master' do
+      site_pp = <<-EOS  
+        mikrotik_ospfv3_interface { 'ether1':
+          ensure  => disabled,
+          passive => true,
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+end
