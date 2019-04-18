@@ -1,5 +1,54 @@
 require 'spec_helper_acceptance'
 
+describe '/system/package' do
+  before { skip("Skipping this test for now") }
+  
+  include_context 'testnodes defined'
+
+  context "reset configuration" do      
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_package { 'ipv6':
+          ensure => enabled,
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run after failures', 1
+  end  
+  
+  context "disable package" do      
+    it 'should update master' do
+      site_pp = <<-EOS           
+        mikrotik_package { 'ipv6':
+          ensure => disabled,
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+
+    it_behaves_like 'an idempotent device run'
+  end
+
+  context "enable package and reboot" do      
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_package { 'ipv6':
+          ensure       => enabled,
+          force_reboot => true          
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+
+    it_behaves_like 'an idempotent device run'
+  end
+end
+
 describe '/ipv6/address' do
   before { skip("Skipping this test for now") }
   

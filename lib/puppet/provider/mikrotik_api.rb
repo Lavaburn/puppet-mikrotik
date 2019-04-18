@@ -103,6 +103,38 @@ class Puppet::Provider::Mikrotik_Api < Puppet::Provider
     end
   end
   
+  def self.enable(path, params_hash)
+    Puppet.debug("Enabling #{path}: #{params_hash.inspect}")
+
+    params = []
+    params << params_hash.collect { |k,v| "=#{k}=#{v}" }
+    #Puppet.debug("Params: #{params.inspect}")
+    
+    result = connection.get_reply("#{path}/enable", *params)    # .id => ?.id ???
+    Puppet.debug("Set Result: #{result}")
+    result.each do |res|
+      if res.key?('!trap')
+        raise "Error while setting #{path}: #{res['message']}"
+      end
+    end
+  end
+
+  def self.disable(path, params_hash)
+    Puppet.debug("Disabling #{path}: #{params_hash.inspect}")
+
+    params = []
+    params << params_hash.collect { |k,v| "=#{k}=#{v}" }
+    #Puppet.debug("Params: #{params.inspect}")
+    
+    result = connection.get_reply("#{path}/disable", *params)    # .id => ?.id ???
+    Puppet.debug("Set Result: #{result}")
+    result.each do |res|
+      if res.key?('!trap')
+        raise "Error while setting #{path}: #{res['message']}"
+      end
+    end
+  end
+
   def self.command(path, params_hash = {})
     Puppet.debug("Running Command: #{path}: #{params_hash.inspect}")
 
