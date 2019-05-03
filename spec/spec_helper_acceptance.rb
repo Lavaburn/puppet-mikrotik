@@ -25,8 +25,8 @@ RSpec.configure do |c|
     proj_root = File.expand_path(File.join(File.dirname(__FILE__), '..'))
       
     # Install the correct Puppet version
-    run_puppet_install_helper("agent", "5.5.10")
-    # FAILS: run_puppet_install_helper("agent", "6.2.0")
+    #run_puppet_install_helper("agent", "5.5.10")
+    run_puppet_install_helper("agent", "6.2.0")
       
     # Generic for every host    
     hosts.each do |host|

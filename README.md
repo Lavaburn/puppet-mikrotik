@@ -34,7 +34,7 @@ Works:
 * Ruby 2.4.5
 * Puppet 5.5.10
 
-DOES NOT WORK: 
+Works ("puppet6" branch): 
 * Ruby 2.4.5
 * Puppet 6.0.5 - 6.2.0
 
