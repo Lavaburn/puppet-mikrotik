@@ -149,6 +149,87 @@ describe '/ip/route' do
   end
 end
 
+describe '/routing/filter ensurable' do
+  before { skip("Skipping this test for now") }
+  
+  include_context 'testnodes defined'
+
+  context "reset configuration" do      
+    it 'should update master' do
+      site_pp = <<-EOS        
+        mikrotik_routing_filter { ['test_filter1', 'test_filter2', 'test_filter3']:
+          ensure => absent,          
+        }        
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run after failures', 1
+  end  
+  
+  
+  context "create new filter" do
+    it 'should update master' do
+      site_pp = <<-EOS   
+        mikrotik_routing_filter { 'test_filter1':
+          chain         => 'OSPF_TEST1',
+          prefix        => '172.21.0.0/16',
+          action        => 'discard',
+        }
+        
+        mikrotik_routing_filter { 'test_filter2':
+          ensure        => present,
+          chain         => 'OSPF_TEST2',
+          prefix        => '172.22.0.0/16',
+          action        => 'discard',
+        }     
+        
+        mikrotik_routing_filter { 'test_filter3':
+          ensure        => disabled,
+          chain         => 'OSPF_TEST3',
+          prefix        => '172.23.0.0/16',
+          action        => 'discard',
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+  
+  context "update filter" do
+    it 'should update master' do
+      site_pp = <<-EOS   
+        mikrotik_routing_filter { 'test_filter1':
+          ensure        => disabled,
+          chain         => 'OSPF_TEST1',
+          prefix        => '172.21.0.0/16',
+          action        => 'discard',
+        }
+        
+        mikrotik_routing_filter { 'test_filter2':
+          chain         => 'OSPF_TEST2',
+          prefix        => '172.22.0.0/16',
+          action        => 'discard',
+        }     
+        
+        mikrotik_routing_filter { 'test_filter3':
+          ensure        => enabled,
+          chain         => 'OSPF_TEST3',
+          prefix        => '172.23.0.0/16',
+          action        => 'discard',
+        }            
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+end
+
 describe '/routing/filter' do
   before { skip("Skipping this test for now") }
   
