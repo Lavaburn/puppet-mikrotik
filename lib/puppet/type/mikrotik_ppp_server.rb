@@ -85,4 +85,45 @@ Puppet::Type.newtype(:mikrotik_ppp_server) do
   newproperty(:allow_fastpath) do
     desc '(L2TP) Whether to allow Fast Path'
   end
+
+  #OVPN Only
+  newproperty(:port) do
+    desc '(OVPN) Port to run the server on'
+  end
+
+  newproperty(:mode) do
+    desc '(OVPN) IP (tunnel) mode or Ethernet (bridge/tap) mode'
+    newvalue(:ip)
+    newvalue(:ethernet)
+  end
+
+  newproperty(:netmask) do
+    desc '(OVPN) Subnet mask to be applied to clients'
+  end
+
+  newproperty(:mac_address) do
+    desc '(OVPN) MAC address of the server (normally auto-generated)'
+  end
+
+  newproperty(:certificate) do
+    desc '(OVPN) name of Certificate file'
+  end
+
+  newproperty(:require_client_certificate) do
+    newvalue(:true)
+    newvalue(:false)
+  end
+
+  newproperty(:cipher, :array_matching => :all) do
+    desc '(OVPN) Cipher algorithms'
+
+    def insync?(is)
+      if is.is_a?(Array) and @should.is_a?(Array)
+        is.sort == @should.sort
+      else
+        is == @should
+      end
+    end
+  end
+
 end

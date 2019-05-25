@@ -41,7 +41,11 @@ Puppet::Type.newtype(:mikrotik_ppp_profile) do
   
   newproperty(:address_list) do
     desc 'Address list to add active sessions on'
-  end  
+  end
+
+  newproperty(:interface_list) do
+    desc 'Interface list to add active sessions on'
+  end
 
   newproperty(:dns_server) do
     desc 'DNS Server to assign to the PPP client'
