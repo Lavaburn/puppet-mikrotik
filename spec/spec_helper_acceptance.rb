@@ -60,7 +60,8 @@ RSpec.configure do |c|
   
       # First time, install mtik gem on all hosts
       hosts.each do |host|
-        on host, '/opt/puppetlabs/puppet/bin/gem install mtik'
+        # on host, '/opt/puppetlabs/puppet/bin/gem install mtik'
+        apply_manifest_on(host, "include ::mikrotik")
       end
     end
   

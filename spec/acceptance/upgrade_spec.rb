@@ -114,7 +114,7 @@ describe '/system/upgrade' do
 
   # Action: Download + Reboot
   context "install package and reboot" do      
-    # before { skip("Skipping this test for now") }
+    before { skip("Skipping this test for now") }
     
     it 'should update master' do
       site_pp = <<-EOS            
@@ -131,7 +131,7 @@ describe '/system/upgrade' do
   end
   
   context "download installed package" do     
-    # before { skip("Skipping this test for now") }
+    before { skip("Skipping this test for now") }
      
     it 'should update master' do
       site_pp = <<-EOS            
