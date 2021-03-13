@@ -3,12 +3,36 @@ Puppet Module for managing Mikrotik Devices
 
 Work in Progress.
 
+
+## Local Testing
+
 ### Bootstrap
 For local testing using RVM:
 * rvm use 2.4.5
 * gem install bundler
 * bundle install --binstubs [LEGACY?]
-* rake beaker
+
+
+## Acceptance Testing
+
+Single run:
+
+	rake beaker
+	
+Multiple runs: 
+	
+	BEAKER_provision=yes BEAKER_destroy=no rake beaker
+	
+	BEAKER_provision=no BEAKER_destroy=no rake beaker
+	
+	BEAKER_provision=no BEAKER_destroy=onpass rake beaker
+	
+### Debugging inside Vagrant
+
+	cd .vagrant/beaker_vagrant_files/default.yml
+	
+	vagrant ssh puppet
+	vagrant ssh ubuntu-16-04
 
 ### Defining SUT and environment
 * See spec/fixtures/testnodes.example.yaml
@@ -19,11 +43,11 @@ For local testing using RVM:
 * cd vagrant; vagrant up
 See spec/fixtures/testnodes.example.yaml
 
-#### IPv6
+
+## NOTES
+
+### IPv6
 The IPv6 package is not installed by default!
-
-TODO !!!
-
 
 ### Tested Using
 Works:
@@ -36,7 +60,4 @@ Works:
 
 Works ("puppet6" branch): 
 * Ruby 2.4.5
-* Puppet 6.0.5 - 6.2.0
-
-## Support
-* ONLY Puppet 4 and 5 supported!
+* Puppet 6.13.0

@@ -26,7 +26,7 @@ RSpec.configure do |c|
       
     # Install the correct Puppet version
     #run_puppet_install_helper("agent", "5.5.10")
-    run_puppet_install_helper("agent", "6.2.0")
+    run_puppet_install_helper("agent", "6.13.0")
       
     # Generic for every host    
     hosts.each do |host|
@@ -51,6 +51,10 @@ RSpec.configure do |c|
       on master, "chown puppet #{autosign_file}"
       
       on master, 'service puppetserver start'  
+        
+      # TODO: The strangest BUGFIX for Puppetserver 6.15.1
+      on master, 'mkdir -p /opt/puppetlabs/server/data/puppetserver/yaml/facts'
+      on master, 'chown -R puppet:puppet /opt/puppetlabs/server/data/puppetserver/yaml'
         
       # TODO ? # Pluginsync requires 1 run on master?
       # TODO ? site_pp = '/etc/puppetlabs/code/environments/production/manifests/site.pp'
