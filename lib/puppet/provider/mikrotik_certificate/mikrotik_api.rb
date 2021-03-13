@@ -1,4 +1,4 @@
-require 'puppet/provider/mikrotik_api'
+require_relative '../mikrotik_api'
 require 'openssl'
 
 Puppet::Type.type(:mikrotik_certificate).provide(:mikrotik_api, :parent => Puppet::Provider::Mikrotik_Api) do
