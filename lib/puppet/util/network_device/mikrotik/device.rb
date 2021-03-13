@@ -1,6 +1,6 @@
 require 'puppet/util/network_device'
-require 'puppet/util/network_device/mikrotik/facts'
-require 'puppet/util/network_device/transport/mikrotik'
+require_relative 'facts'
+require_relative '../transport/mikrotik'
 
 class Puppet::Util::NetworkDevice::Mikrotik::Device
   attr_reader :connection
