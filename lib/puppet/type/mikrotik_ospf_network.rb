@@ -14,4 +14,8 @@ Puppet::Type.newtype(:mikrotik_ospf_network) do
   newproperty(:area) do
     desc 'The OSPF Area this network belongs to.'
   end
+
+  newproperty(:comment) do
+    desc 'A comment that describes this network'
+  end
 end

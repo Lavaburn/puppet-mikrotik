@@ -13,9 +13,10 @@ Puppet::Type.type(:mikrotik_ospf_network).provide(:mikrotik_api, :parent => Pupp
   
   def self.ospfNetwork(data)
       new(
-        :ensure => :present,
-        :name   => data['network'],
-        :area   => data['area']
+        :ensure  => :present,
+        :name    => data['network'],
+        :area    => data['area'],
+        :comment => data['comment'],
       )
   end
 
@@ -25,6 +26,7 @@ Puppet::Type.type(:mikrotik_ospf_network).provide(:mikrotik_api, :parent => Pupp
     params = {}
     params["network"] = resource[:name]
     params["area"] = resource[:area] if ! resource[:area].nil?
+    params["comment"] = resource[:comment] if ! resource[:comment].nil?
 
     lookup = {}
     lookup["network"] = resource[:name]
