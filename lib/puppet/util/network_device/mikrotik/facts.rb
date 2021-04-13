@@ -13,7 +13,9 @@ class Puppet::Util::NetworkDevice::Mikrotik::Facts
 
   def retrieve
     facts_raw = {}
+    Puppet.info("Getting device facts.")
     system_resources = connection.get_reply("/system/resource/getall")
+    Puppet.debug("Got device facts: #{system_resources.inspect}")
     system_resources.each do |system_resource|
       if system_resource.key?('!re')
         facts_raw = system_resource.reject { |k, v| ['!re', '.tag'].include? k }
@@ -42,6 +44,7 @@ class Puppet::Util::NetworkDevice::Mikrotik::Facts
   end
 
   def ec2_metadata
+    Puppet.info('Getting EC2 metadata facts from device.')
     {
       'instance-id' => ec2('instance-id'),
       'instance-type' => ec2('instance-type'),
@@ -61,7 +64,9 @@ class Puppet::Util::NetworkDevice::Mikrotik::Facts
       'output' => 'user',
     }
     p_array = params.map { |k,v| "=#{k}=#{v}" }
+    Puppet.debug("Requested device fetch #{params.inspect}")
     reply = connection.get_reply('/tools/fetch',*p_array)
+    Puppet.debug("Got response: #{reply.inspect}")
     if result = reply.find_sentence('data')
       result['data']
     else
