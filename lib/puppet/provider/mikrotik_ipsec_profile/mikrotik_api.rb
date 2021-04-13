@@ -19,7 +19,7 @@ Puppet::Type.type(:mikrotik_ipsec_profile).provide(:mikrotik_api, :parent => Pup
     instances
   end
 
-  def self.ipsecPeer(data)
+  def self.ipsecProfile(data)
     if data['disabled'] == "true"
       state = :disabled
     else
