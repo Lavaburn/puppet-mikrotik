@@ -109,5 +109,5 @@ Puppet::Type.newtype(:mikrotik_ipsec_identity) do
   autorequire(:mikrotik_certificate) { self[:certificate] }
   autorequire(:mikrotik_ipsec_mode_config) { self[:mode_config] }
   autorequire(:mikrotik_ipsec_peer) { self[:peer] }
-  autorequire(:mikrotik_ipsec_group) { self[:policy_tempalte_group] }
+  autorequire(:mikrotik_ipsec_group) { self[:policy_template_group] }
 end
