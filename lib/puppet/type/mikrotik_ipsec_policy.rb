@@ -64,7 +64,7 @@ Puppet::Type.newtype(:mikrotik_ipsec_policy) do
   end
 
   newproperty(:protocol) do
-    desc "The protocol to something something"
+    desc "The IP packet protocol to match"
     newvalues(*%w{
       all dccp ddp egp encap etherip ggp gre hmp icmp icmpv6 idpr-cmtp igmp ipencap ipip ipsec-ah ipsec-esp ipv6 ipv6-frag ipv6-nonxt
       ipv6-opts ipv6-route iso-tp4 l2tp ospf pim pup rdp rspf rsvp sctp st tcp udp udp-lite vmtp vrrp xns-idp xtp
@@ -72,7 +72,7 @@ Puppet::Type.newtype(:mikrotik_ipsec_policy) do
   end
 
   newproperty(:template, boolean: true, parent: Puppet::Property::Boolean) do
-    desc 'Whether this is a policy template or a peer-specific policy'
+    desc 'Whether this is a policy template or a peer-specific policy. Templates use only the following properties: group, src_address, dst_address, protocol, proposal'
     defaultto true
   end
 
@@ -86,7 +86,7 @@ Puppet::Type.newtype(:mikrotik_ipsec_policy) do
   end
 
   newproperty(:action) do
-    desc 'The action to take'
+    desc 'Specifies what to do with the packet matched by the policy.'
     newvalues(:encrypt,:discard,:none)
   end
 
@@ -116,4 +116,5 @@ Puppet::Type.newtype(:mikrotik_ipsec_policy) do
 
   autorequire(:mikrotik_ipsec_peer) { self[:peer] }
   autorequire(:mikrotik_ipsec_proposal) { self[:proposal] }
+  autorequire(:mikrotik_ipsec_group) { self[:group] }
 end

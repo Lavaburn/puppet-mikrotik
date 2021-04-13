@@ -48,10 +48,12 @@ Puppet::Type.newtype(:mikrotik_ipsec_identity) do
   end
 
   newproperty(:auth_method) do
+    desc 'The authentication method to use.'
     newvalues(*%w{digital-signature eap eap-radius pre-shared-key pre-shared-key-xauth rsa-key rsa-signature-hybrid})
   end
 
   newproperty(:certificate) do
+    desc 'Name of an installed certificate to use for signing packets.'
   end
 
   newproperty(:eap_methods, :array_matching => :all) do
@@ -59,10 +61,12 @@ Puppet::Type.newtype(:mikrotik_ipsec_identity) do
   end
 
   newproperty(:generate_policy) do
+    desc 'Whether this identity is allowed to dynamically generate a policy from a policy-template-group if no existing policy matches'
     newvalues(*%w{no port-override port-strict})
   end
 
   newproperty(:key) do
+    desc 'name of the private key to use from the installed IPSec Keys. Only applicable if auth_method is rsa-key.'
   end
 
   newproperty(:match_by) do
@@ -105,4 +109,5 @@ Puppet::Type.newtype(:mikrotik_ipsec_identity) do
   autorequire(:mikrotik_certificate) { self[:certificate] }
   autorequire(:mikrotik_ipsec_mode_config) { self[:mode_config] }
   autorequire(:mikrotik_ipsec_peer) { self[:peer] }
+  autorequire(:mikrotik_ipsec_group) { self[:policy_tempalte_group] }
 end

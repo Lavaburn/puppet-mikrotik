@@ -31,8 +31,8 @@ Puppet::Type.type(:mikrotik_ipsec_profile).provide(:mikrotik_api, :parent => Pup
       :lifebytes             => data['lifebytes'],
       :lifetime              => data['lifetime'],
       :nat_traversal         => data['nat-traversal'],
-      :prf_algorithm         => data['prf-algorithm'],
-      :proposal_check        => data['proposal_check'],
+      :prf_algorithm         => data['prf-algorithm'] || 'auto',
+      :proposal_check        => data['proposal-check'],
     )
   end
 
