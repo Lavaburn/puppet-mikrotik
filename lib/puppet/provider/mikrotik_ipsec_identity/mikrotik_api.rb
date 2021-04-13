@@ -27,7 +27,9 @@ Puppet::Type.type(:mikrotik_ipsec_identity).provide(:mikrotik_api, :parent => Pu
         state = :enabled
       end
 
-      eap_methods = data['eap-methods'].split(',').map {|mthd| mthd[4..-1] }
+      if data['eap-methods']
+        eap_methods = data['eap-methods'].split(',').map {|mthd| mthd[4..-1] }
+      end
 
       new(
         :ensure                => :present,
