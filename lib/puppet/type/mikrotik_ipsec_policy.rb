@@ -2,20 +2,20 @@ require 'puppet/property/boolean'
 
 Puppet::Type.newtype(:mikrotik_ipsec_policy) do
   apply_to_all
-  
+
   ensurable do
     defaultto :present
-    
+
     newvalue(:present) do
-      provider.create  
+      provider.create
     end
-    
+
     newvalue(:absent) do
       provider.destroy
     end
-    
+
     newvalue(:enabled) do
-      provider.setState(:enabled)      
+      provider.setState(:enabled)
     end
 
     newvalue(:disabled) do
@@ -25,23 +25,23 @@ Puppet::Type.newtype(:mikrotik_ipsec_policy) do
     def retrieve
       provider.getState
     end
-    
+
     def insync?(is)
-      @should.each { |should| 
+      @should.each { |should|
         case should
           when :present
             return (provider.getState != :absent)
           when :absent
             return (provider.getState == :absent)
-          when :enabled                   
+          when :enabled
             return (provider.getState == :enabled)
-          when :disabled                      
-            return (provider.getState == :disabled)       
+          when :disabled
+            return (provider.getState == :disabled)
         end
-      }      
+      }
     end
   end
-  
+
   newparam(:name) do
     desc 'Policy description'
     isnamevar

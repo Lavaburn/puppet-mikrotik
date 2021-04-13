@@ -30,7 +30,6 @@ Puppet::Type.type(:mikrotik_ipsec_profile).provide(:mikrotik_api, :parent => Pup
       :ensure                => :present,
       :state                 => state,
       :name                  => data['name'],
-      :comment               => data['comment'],
       :dh_group              => data['dh-group'].nil? ? nil : data['dh-group'].split(','),
       :dpd_interval          => data['dpd-interval'],
       :dpd_maximum_failures  => data['dpd-maximum-failures'],
@@ -56,7 +55,6 @@ Puppet::Type.type(:mikrotik_ipsec_profile).provide(:mikrotik_api, :parent => Pup
     end
 
     params["name"] = resource[:name]
-    params["comment"] = resource[:comment]
     params["dh-group"] = resource[:dh_group].join(',') unless resource[:dh_group].nil?
     params["dpd-interval"] = resource[:dpd_interval]
     params["dpd-maximum-failures"] = resource[:dpd_maximum_failures]
