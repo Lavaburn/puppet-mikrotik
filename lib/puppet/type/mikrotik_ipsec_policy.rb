@@ -72,11 +72,17 @@ Puppet::Type.newtype(:mikrotik_ipsec_policy) do
   end
 
   newproperty(:template, boolean: true, parent: Puppet::Property::Boolean) do
-    desc 'whether to template???'
+    desc 'Whether this is a policy template or a peer-specific policy'
     defaultto true
   end
 
   newproperty(:group) do
+    desc 'The template group that includes this policy template'
+    validate do |value|
+      if value && !resource[:template]
+        raise ArgumentError, "only policy templates can belong to template groups"
+      end
+    end
   end
 
   newproperty(:action) do
@@ -88,13 +94,17 @@ Puppet::Type.newtype(:mikrotik_ipsec_policy) do
     newvalues(:esp,:ah)
   end
 
-  newproperty(:sa_src_address) do
-  end
-
-  newproperty(:sa_dst_address) do
+  newproperty(:peer) do
+    desc 'the peer this policy applies to, if this is not a template'
+    validate do |value|
+      if value && resource[:template]
+        raise ArgumentError, "do not specify a peer for a policy template"
+      end
+    end
   end
 
   newproperty(:proposal) do
+    desc 'the IPSec proposal to use'
   end
 
   newproperty(:level) do
@@ -103,4 +113,7 @@ Puppet::Type.newtype(:mikrotik_ipsec_policy) do
 
   newproperty(:tunnel, boolean: true, parent: Puppet::Property::Boolean) do
   end
+
+  autorequire(:mikrotik_ipsec_peer) { self[:peer] }
+  autorequire(:mikrotik_ipsec_proposal) { self[:proposal] }
 end
