@@ -65,7 +65,7 @@ class Puppet::Util::NetworkDevice::Mikrotik::Facts
     }
     p_array = params.map { |k,v| "=#{k}=#{v}" }
     Puppet.debug("Requested device fetch #{params.inspect}")
-    reply = connection.get_reply('/tools/fetch',*p_array)
+    reply = connection.get_reply('/tool/fetch',*p_array)
     Puppet.debug("Got response: #{reply.inspect}")
     if result = reply.find_sentence('data')
       result['data']
