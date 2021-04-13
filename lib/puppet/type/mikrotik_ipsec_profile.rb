@@ -14,14 +14,6 @@ Puppet::Type.newtype(:mikrotik_ipsec_profile) do
       provider.destroy
     end
 
-    newvalue(:enabled) do
-      provider.setState(:enabled)
-    end
-
-    newvalue(:disabled) do
-      provider.setState(:disabled)
-    end
-
     def retrieve
       provider.getState
     end
@@ -33,10 +25,6 @@ Puppet::Type.newtype(:mikrotik_ipsec_profile) do
             return (provider.getState != :absent)
           when :absent
             return (provider.getState == :absent)
-          when :enabled
-            return (provider.getState == :enabled)
-          when :disabled
-            return (provider.getState == :disabled)
         end
       }
     end

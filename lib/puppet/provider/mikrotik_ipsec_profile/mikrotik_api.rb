@@ -20,15 +20,8 @@ Puppet::Type.type(:mikrotik_ipsec_profile).provide(:mikrotik_api, :parent => Pup
   end
 
   def self.ipsecProfile(data)
-    if data['disabled'] == "true"
-      state = :disabled
-    else
-      state = :enabled
-    end
-
     new(
       :ensure                => :present,
-      :state                 => state,
       :name                  => data['name'],
       :dh_group              => data['dh-group'].nil? ? nil : data['dh-group'].split(','),
       :dpd_interval          => data['dpd-interval'],
@@ -47,12 +40,6 @@ Puppet::Type.type(:mikrotik_ipsec_profile).provide(:mikrotik_api, :parent => Pup
     Puppet.debug("Flushing IPSec Profile #{resource[:name]}")
 
     params = {}
-
-    if @property_hash[:state] == :disabled
-      params["disabled"] = 'yes'
-    elsif @property_hash[:state] == :enabled
-      params["disabled"] = 'no'
-    end
 
     params["name"] = resource[:name]
     params["dh-group"] = resource[:dh_group].join(',') unless resource[:dh_group].nil?
