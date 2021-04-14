@@ -2,20 +2,20 @@ require 'puppet/property/boolean'
 
 Puppet::Type.newtype(:mikrotik_ipsec_policy) do
   apply_to_all
-  
+
   ensurable do
     defaultto :present
-    
+
     newvalue(:present) do
-      provider.create  
+      provider.create
     end
-    
+
     newvalue(:absent) do
       provider.destroy
     end
-    
+
     newvalue(:enabled) do
-      provider.setState(:enabled)      
+      provider.setState(:enabled)
     end
 
     newvalue(:disabled) do
@@ -25,23 +25,23 @@ Puppet::Type.newtype(:mikrotik_ipsec_policy) do
     def retrieve
       provider.getState
     end
-    
+
     def insync?(is)
-      @should.each { |should| 
+      @should.each { |should|
         case should
           when :present
             return (provider.getState != :absent)
           when :absent
             return (provider.getState == :absent)
-          when :enabled                   
+          when :enabled
             return (provider.getState == :enabled)
-          when :disabled                      
-            return (provider.getState == :disabled)       
+          when :disabled
+            return (provider.getState == :disabled)
         end
-      }      
+      }
     end
   end
-  
+
   newparam(:name) do
     desc 'Policy description'
     isnamevar
@@ -64,7 +64,7 @@ Puppet::Type.newtype(:mikrotik_ipsec_policy) do
   end
 
   newproperty(:protocol) do
-    desc "The protocol to something something"
+    desc "The IP packet protocol to match"
     newvalues(*%w{
       all dccp ddp egp encap etherip ggp gre hmp icmp icmpv6 idpr-cmtp igmp ipencap ipip ipsec-ah ipsec-esp ipv6 ipv6-frag ipv6-nonxt
       ipv6-opts ipv6-route iso-tp4 l2tp ospf pim pup rdp rspf rsvp sctp st tcp udp udp-lite vmtp vrrp xns-idp xtp
@@ -72,15 +72,21 @@ Puppet::Type.newtype(:mikrotik_ipsec_policy) do
   end
 
   newproperty(:template, boolean: true, parent: Puppet::Property::Boolean) do
-    desc 'whether to template???'
+    desc 'Whether this is a policy template or a peer-specific policy. Templates use only the following properties: group, src_address, dst_address, protocol, proposal'
     defaultto true
   end
 
   newproperty(:group) do
+    desc 'The template group that includes this policy template'
+    validate do |value|
+      if value && !resource[:template]
+        raise ArgumentError, "only policy templates can belong to template groups"
+      end
+    end
   end
 
   newproperty(:action) do
-    desc 'The action to take'
+    desc 'Specifies what to do with the packet matched by the policy.'
     newvalues(:encrypt,:discard,:none)
   end
 
@@ -88,13 +94,17 @@ Puppet::Type.newtype(:mikrotik_ipsec_policy) do
     newvalues(:esp,:ah)
   end
 
-  newproperty(:sa_src_address) do
-  end
-
-  newproperty(:sa_dst_address) do
+  newproperty(:peer) do
+    desc 'the peer this policy applies to, if this is not a template'
+    validate do |value|
+      if value && resource[:template]
+        raise ArgumentError, "do not specify a peer for a policy template"
+      end
+    end
   end
 
   newproperty(:proposal) do
+    desc 'the IPSec proposal to use'
   end
 
   newproperty(:level) do
@@ -103,4 +113,8 @@ Puppet::Type.newtype(:mikrotik_ipsec_policy) do
 
   newproperty(:tunnel, boolean: true, parent: Puppet::Property::Boolean) do
   end
+
+  autorequire(:mikrotik_ipsec_peer) { self[:peer] }
+  autorequire(:mikrotik_ipsec_proposal) { self[:proposal] }
+  autorequire(:mikrotik_ipsec_group) { self[:group] }
 end

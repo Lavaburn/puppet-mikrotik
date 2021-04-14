@@ -2,21 +2,21 @@ require 'puppet/provider/mikrotik_api'
 
 Puppet::Type.type(:mikrotik_ipsec_policy).provide(:mikrotik_api, :parent => Puppet::Provider::Mikrotik_Api) do
   confine :feature => :mtik
-  
+
   mk_resource_methods
 
-  def self.instances   
+  def self.instances
     instances = []
     policies = Puppet::Provider::Mikrotik_Api::get_all("/ip/ipsec/policy")
     policies.each do |policy|
       object = ipsecPolicy(policy)
-      if object != nil        
+      if object != nil
         instances << object
       end
     end
     instances
   end
-  
+
   def self.prefetch(resources)
     nodes = instances
     resources.keys.each do |name|
@@ -33,7 +33,7 @@ Puppet::Type.type(:mikrotik_ipsec_policy).provide(:mikrotik_api, :parent => Pupp
       else
         state = :enabled
       end
-      
+
       new(
         :ensure               => :present,
         :state                => state,
@@ -46,19 +46,18 @@ Puppet::Type.type(:mikrotik_ipsec_policy).provide(:mikrotik_api, :parent => Pupp
         :level                => data['level'],
         :proposal             => data['proposal'],
         :protocol             => data['protocol'],
-        :sa_dst_address       => data['sa-dst-address'],
-        :sa_src_address       => data['sa-src-address'],
         :src_address          => data['src-address'],
         :src_port             => data['src-port'],
         :template             => data['template'],
         :tunnel               => data['tunnel'],
+        :peer                 => data['peer'],
       )
     end
   end
 
   def flush
     Puppet.debug("Flushing IPSec Policy #{resource[:name]}")
-      
+
     params = {}
 
     if @property_hash[:state] == :disabled
@@ -66,7 +65,7 @@ Puppet::Type.type(:mikrotik_ipsec_policy).provide(:mikrotik_api, :parent => Pupp
     elsif @property_hash[:state] == :enabled
       params["disabled"] = 'no'
     end
-    
+
     params["comment"] = resource[:name]
     params["action"] = resource[:action]
     params["dst-address"] = resource[:dst_address]
@@ -76,18 +75,17 @@ Puppet::Type.type(:mikrotik_ipsec_policy).provide(:mikrotik_api, :parent => Pupp
     params["level"] = resource[:level]
     params["proposal"] = resource[:proposal]
     params["protocol"] = resource[:protocol]
-    params["sa-dst-address"] = resource[:sa_dst_address]
-    params["sa-src-address"] = resource[:sa_src_address]
     params["src-address"] = resource[:src_address]
     params["src-port"] = resource[:src_port]
     params["template"] = resource[:template]
     params["tunnel"] = resource[:tunnel]
+    params["peer"] = resource[:peer]
     params.compact!
 
-    lookup = { "name" => resource[:name] }
-    
+    lookup = { "comment" => resource[:name] }
+
     Puppet.debug("Params: #{params.inspect} - Lookup: #{lookup.inspect}")
 
     simple_flush("/ip/ipsec/policy", params, lookup)
-  end  
+  end
 end

@@ -2,9 +2,9 @@ require 'puppet/property/boolean'
 
 Puppet::Type.newtype(:mikrotik_ipsec_mode_config) do
   apply_to_all
-  
+
   ensurable
-  
+
   newparam(:name) do
     desc 'Mode Config description'
     isnamevar
@@ -22,7 +22,7 @@ Puppet::Type.newtype(:mikrotik_ipsec_mode_config) do
   newproperty(:split_include, :array_matching => :all) do
   end
 
-  newproperty(:static_dns) do
+  newproperty(:static_dns, :array_matching => :all) do
   end
 
   newproperty(:system_dns, boolean: true, parent: Puppet::Property::Boolean) do
