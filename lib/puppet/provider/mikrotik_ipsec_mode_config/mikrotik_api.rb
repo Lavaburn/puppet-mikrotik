@@ -27,7 +27,7 @@ Puppet::Type.type(:mikrotik_ipsec_mode_config).provide(:mikrotik_api, :parent =>
       :address_pool          => data['address-pool'],
       :address_prefix_length => data['address-prefix-length'],
       :split_include         => data['split-include'].nil? ? nil : data['split-include'].split(','),
-      :static_dns            => data['static-dns'].nil? ? nil : data['static_dns'].split(','),
+      :static_dns            => data['static-dns'].nil? ? nil : data['static-dns'].split(','),
       :system_dns            => data['system-dns'],
     )
   end
