@@ -7,15 +7,12 @@ class Puppet::Util::NetworkDevice::Mikrotik::Device
   attr_accessor :url, :transport
 
   def initialize(url, options = {})
-    # Puppet <= 5
-#    @autoloader = Puppet::Util::Autoload.new(
-#      self,
-#      'puppet/util/network_device/transport'
-#    )
-#    if @autoloader.load('mikrotik')
-#      @transport = Puppet::Util::NetworkDevice::Transport::Mikrotik.new(url, options[:debug])
-#    end
-    # Puppet 6    
+    # Puppet 5 support
+    if Gem::Version.new(Puppet.version) < Gem::Version.new("6.0.0")      
+      @autoloader = Puppet::Util::Autoload.new(self, 'puppet/util/network_device/transport')
+      @autoloader.load('mikrotik')
+    end
+ 
     @transport = Puppet::Util::NetworkDevice::Transport::Mikrotik.new(url, options[:debug])
   end
 
