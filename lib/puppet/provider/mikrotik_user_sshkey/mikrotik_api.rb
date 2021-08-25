@@ -1,4 +1,4 @@
-require 'puppet/provider/mikrotik_api'
+require_relative '../mikrotik_api'
 
 Puppet::Type.type(:mikrotik_user_sshkey).provide(:mikrotik_api, :parent => Puppet::Provider::Mikrotik_Api) do
   confine :feature => :mtik

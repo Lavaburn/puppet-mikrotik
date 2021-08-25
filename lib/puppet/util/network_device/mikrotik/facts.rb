@@ -1,4 +1,4 @@
-require 'puppet/util/network_device/mikrotik'
+require_relative '../mikrotik'
 
 class Puppet::Util::NetworkDevice::Mikrotik::Facts
   attr_reader :transport

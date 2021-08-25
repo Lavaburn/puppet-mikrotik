@@ -1,19 +1,22 @@
 require 'puppet/util/network_device'
-require 'puppet/util/network_device/mikrotik/facts'
-require 'puppet/util/network_device/transport/mikrotik'
+require_relative 'facts'
+require_relative '../transport/mikrotik'
 
 class Puppet::Util::NetworkDevice::Mikrotik::Device
   attr_reader :connection
   attr_accessor :url, :transport
 
   def initialize(url, options = {})
-    @autoloader = Puppet::Util::Autoload.new(
-      self,
-      'puppet/util/network_device/transport'
-    )
-    if @autoloader.load('mikrotik')
-      @transport = Puppet::Util::NetworkDevice::Transport::Mikrotik.new(url, options[:debug])
-    end
+    # Puppet <= 5
+#    @autoloader = Puppet::Util::Autoload.new(
+#      self,
+#      'puppet/util/network_device/transport'
+#    )
+#    if @autoloader.load('mikrotik')
+#      @transport = Puppet::Util::NetworkDevice::Transport::Mikrotik.new(url, options[:debug])
+#    end
+    # Puppet 6    
+    @transport = Puppet::Util::NetworkDevice::Transport::Mikrotik.new(url, options[:debug])
   end
 
   def facts
