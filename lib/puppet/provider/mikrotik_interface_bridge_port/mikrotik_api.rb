@@ -19,10 +19,19 @@ Puppet::Type.type(:mikrotik_interface_bridge_port).provide(:mikrotik_api, :paren
     end
     
     new(
-      :ensure => :present,
-      :state  => state,
-      :name   => data['interface'],
-      :bridge => data['bridge']
+      :ensure             => :present,
+      :state              => state,
+      :name               => data['interface'],
+      :bridge             => data['bridge'],
+      :horizon            => data['horizon'],   
+      :priority           => data['priority'],
+      :path_cost          => data['path-cost'],  
+      :internal_path_cost => data['internal-path-cost'],  
+      :pvid               => data['pvid'],     
+      :frame_types        => data['frame-types'],
+      :ingress_filtering  => (data['ingress-filtering'].nil? ? :false : data['ingress-filtering']),
+      :tag_stacking       => (data['tag-stacking'].nil? ? :false : data['tag-stacking']),
+      :comment            => data['comment']
     )
   end
 
@@ -39,9 +48,19 @@ Puppet::Type.type(:mikrotik_interface_bridge_port).provide(:mikrotik_api, :paren
     
     params["interface"] = resource[:name]
     params["bridge"] = resource[:bridge]
+    params["horizon"] = resource[:horizon] if ! resource[:horizon].nil?
+    params["priority"] = resource[:priority] if ! resource[:priority].nil?
+    params["path-cost"] = resource[:path_cost] if ! resource[:path_cost].nil?
+    params["internal-path-cost"] = resource[:internal_path_cost] if ! resource[:internal_path_cost].nil?
+    params["pvid"] = resource[:pvid] if ! resource[:pvid].nil?      
+    params["frame-types"] = resource[:frame_types] if ! resource[:frame_types].nil?
+    params["ingress-filtering"] = Puppet::Provider::Mikrotik_Api::convertBoolToYesNo(resource[:ingress_filtering]) if ! resource[:ingress_filtering].nil?
+    params["tag-stacking"] = Puppet::Provider::Mikrotik_Api::convertBoolToYesNo(resource[:tag_stacking]) if ! resource[:tag_stacking].nil?
+    params["comment"] = resource[:comment] if ! resource[:comment].nil?
 
     lookup = {}
-    lookup["name"] = resource[:name]
+    lookup["interface"] = resource[:name]
+    # ? lookup["bridge"] = resource[:bridge]
     
     Puppet.debug("Params: #{params.inspect} - Lookup: #{lookup.inspect}")
 

@@ -50,13 +50,64 @@ Puppet::Type.newtype(:mikrotik_interface_bridge_port) do
   newproperty(:bridge) do
     desc 'The bridge interface the respective interface is grouped in'
   end
+
+  newproperty(:horizon) do
+    desc 'The bridge horizon (ports with equal value do not exchange packets)'
+  end
   
-  # Not frequently used settings:
-  ## priority -- The priority of the interface in comparison with other going to the same subnet
-  ## path-cost -- Path cost to the interface, used by STP to determine the 'best' path
-  ## horizon --   
-  ## edge -- 
-  ## point-to-point -- 
-  ## external-fdb -- 
-  ## auto-isolate -- 
+  # STP
+  newproperty(:priority) do
+    desc 'The port priority in STP (or between domains in MSTP). Default: 0x80 (hex)'
+  end
+  
+  newproperty(:path_cost) do
+    desc 'The path cost in STP (or between domains in MSTP). Default: 10'
+  end
+  
+  newproperty(:internal_path_cost) do
+    desc 'The path cost in the MSTP domain. Default: 10'
+  end
+
+  # VLAN 
+  newproperty(:pvid) do
+    desc 'Port VLAN ID (untagged)'
+  end
+  
+  newproperty(:frame_types) do
+    desc 'Allow Frame Types'
+    newvalues('admit-all', 'admit-only-untagged-and-priority-tagged', 'admit-only-vlan-tagged')
+  end
+
+  newproperty(:ingress_filtering) do
+    desc 'Whether to enable ingress filtering'
+    newvalues(true, false)
+  end
+
+  newproperty(:tag_stacking) do
+    desc 'Whether to enable tag stacking'
+    newvalues(true, false)
+  end
+  
+  newproperty(:comment) do
+    desc 'Comments'
+  end
+
+  # Less frequently used options:
+
+  ##  learn -- 
+  ##  unknown-unicast-flood -- 
+  ##  unknown-multicast-flood -- 
+  ##  broadcast-flood -- 
+  ##  trusted -- 
+  ##  hw -- 
+  ##  multicast-router -- 
+  ##  fast-leave -- 
+
+  # STP
+  ##  edge -- 
+  ##  point-to-point -- 
+  ##  auto-isolate -- 
+  ##  restricted-role -- 
+  ##  restricted-tcn -- 
+  ##  bpdu-guard -- 
 end
