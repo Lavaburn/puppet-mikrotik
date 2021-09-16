@@ -98,22 +98,33 @@ Puppet::Type.newtype(:mikrotik_interface_te) do
   newproperty(:auto_bandwidth_reserve) do
     desc 'Additional bandwidth to reserve (%)'
   end
-    
-  # Less frequently used options:
-  ##  disable-running-check -- 
+
+  newproperty(:auto_bandwidth_avg_interval) do
+    desc 'Interval at which to average bandwidth used for automatic bandwidth.'
+  end
   
+  newproperty(:auto_bandwidth_update_interval) do
+    desc 'Interval at which to update automatic bandwidth.'
+  end
+
   # TE
-  ## primary-retry-interval -- 
-  ## setup-priority --
-  ## holding-priority --   
+  newproperty(:primary_retry_interval) do
+    desc 'Interval at which to return from secondary to primary path.'
+  end
+  newproperty(:setup_priority) do
+    desc 'Priority (0-7) for bandwidth reservation to set up new tunnel.'
+  end
+  newproperty(:holding_priority) do
+    desc 'Priority (0-7) for bandwidth reservation for running tunnel.'
+  end
+  newproperty(:reoptimize_interval) do
+    desc 'Interval at which to calculate most optimal CSPF route.'
+  end
+
+  # Less frequently used options:
+  ## disable-running-check -- 
   ## affinity-include-all -- 
   ## affinity-include-any -- 
   ## affinity-exclude -- 
-  ## reoptimize-interval -- Used by CSPF 
-  
-  # Bandwidth
-  ## auto-bandwidth-avg-interval -- 
-  ## auto-bandwidth-update-interval -- 
-
   ## comment -- Not visible on Winbox?
 end

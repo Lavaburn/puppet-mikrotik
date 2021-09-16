@@ -19,16 +19,18 @@ Puppet::Type.type(:mikrotik_mpls_te_interface).provide(:mikrotik_api, :parent =>
     end
     
     new(
-      :name      => data['interface'],
-      :ensure    => :present,
-      :state     => state,
-      :bandwidth => data['bandwidth']
+      :name         => data['interface'],
+      :ensure       => :present,
+      :state        => state,
+      :bandwidth    => data['bandwidth'],
+      :k_factor     => data['k-factor'],
+      :refresh_time => data['refresh-time']
     )
   end
 
   def flush 
     Puppet.debug("Flushing MPLS TE Interface #{resource[:name]}")
-      
+
     params = {}
 
     if @property_hash[:state] == :disabled
@@ -36,13 +38,15 @@ Puppet::Type.type(:mikrotik_mpls_te_interface).provide(:mikrotik_api, :parent =>
     elsif @property_hash[:state] == :enabled
       params["disabled"] = 'no'
     end
-    
-    params["interface"] = resource[:name]
-    params["bandwidth"] = resource[:bandwidth] if ! resource[:bandwidth].nil?
-      
+
+    params["interface"]     = resource[:name]
+    params["bandwidth"]     = resource[:bandwidth]    if ! resource[:bandwidth].nil?
+    params["k-factor"]      = resource[:k_factor]     if ! resource[:k_factor].nil?
+    params["refresh-time"]  = resource[:refresh_time] if ! resource[:refresh_time].nil?
+
     lookup = {}
     lookup["interface"] = resource[:name]
-    
+
     Puppet.debug("Params: #{params.inspect} - Lookup: #{lookup.inspect}")
 
     simple_flush("/mpls/traffic-eng/interface", params, lookup)

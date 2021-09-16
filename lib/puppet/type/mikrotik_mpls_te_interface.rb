@@ -51,10 +51,16 @@ Puppet::Type.newtype(:mikrotik_mpls_te_interface) do
     desc 'Interface Bandwidth'
   end
 
+  newproperty(:k_factor) do
+    desc 'Value used to calculate RSVP timeout.'
+  end
+  
+  newproperty(:refresh_time) do
+    desc 'Interval in which RSVP Path messages are sent out.'
+  end
+  
   # Less frequently used options:
-  ## k-factor -- 
   ## resource-class -- 
-  ## refresh-time -- 
   ## use-udp -- 
   ## blockade-k-factor -- 
   ## te-metric -- 
