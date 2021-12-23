@@ -242,3 +242,72 @@ describe '/ppp' do
     it_behaves_like 'an idempotent device run'
   end
 end
+
+
+describe '/pppoe' do
+  #before { skip("Skipping this test for now") }
+  
+  include_context 'testnodes defined'
+
+  context "reset configuration" do      
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_interface_pppoe_server { 'PPPOE1':
+          ensure => absent,
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run after failures', 4
+  end  
+
+  # DISABLED BY DEFAULT!
+  context "create server" do
+    it 'should create server' do
+      site_pp = <<-EOS
+        mikrotik_interface_pppoe_server { 'PPPOE1':
+          interface            => 'ether1',
+          one_session_per_host => true,
+          pado_delay           => 5000,          
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+
+  context "update server" do
+    it 'should update server' do
+      site_pp = <<-EOS
+        mikrotik_interface_pppoe_server { 'PPPOE1':
+          interface            => 'ether1',
+          one_session_per_host => false,
+          pado_delay           => 0,          
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+
+  context "enable server" do
+    it 'should enable server' do
+      site_pp = <<-EOS
+        mikrotik_interface_pppoe_server { 'PPPOE1':
+          interface => 'ether1',
+          ensure    => 'enabled'
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+end
