@@ -184,7 +184,11 @@ Puppet::Type.newtype(:mikrotik_firewall_rule) do
   newproperty(:ipsec_policy) do  # ipsec-policy
     desc 'TODO'
   end
-  
+
+  newproperty(:tls_host) do  # tls-host
+    desc 'TODO'
+  end
+    
   newproperty(:ingress_priority) do  # ingress-priority
     desc 'TODO'
   end
