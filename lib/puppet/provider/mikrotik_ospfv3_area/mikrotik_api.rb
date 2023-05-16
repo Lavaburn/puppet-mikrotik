@@ -2,6 +2,7 @@ require_relative '../mikrotik_api'
 
 Puppet::Type.type(:mikrotik_ospfv3_area).provide(:mikrotik_api, :parent => Puppet::Provider::Mikrotik_Api) do
   confine :feature => :mtik
+  confine :feature => :ros_v6
   
   mk_resource_methods
 

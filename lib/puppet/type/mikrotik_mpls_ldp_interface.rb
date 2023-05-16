@@ -57,7 +57,7 @@ Puppet::Type.newtype(:mikrotik_mpls_ldp_interface) do
     #defaultto "15s"
   end
 
-  newproperty(:transport_address) do
+  newproperty(:transport_address) do  # TODO: ARRAY
     desc 'Transport address for LDP'
   end
 
@@ -66,4 +66,6 @@ Puppet::Type.newtype(:mikrotik_mpls_ldp_interface) do
     newvalues(true, false)
     defaultto true
   end
+  
+  # TODO: AFI
 end

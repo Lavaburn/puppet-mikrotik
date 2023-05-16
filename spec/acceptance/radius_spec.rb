@@ -1,5 +1,6 @@
 require 'spec_helper_acceptance'
 
+# Tested on both ROS v6 and v7
 describe '/radius' do
   before { skip("Skipping this test for now") }
   

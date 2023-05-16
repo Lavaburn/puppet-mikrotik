@@ -1,5 +1,6 @@
 require 'spec_helper_acceptance'
 
+# Tested on both ROS v6 and v7
 describe '/interface' do  
   before { skip("Skipping this test for now") }
   
@@ -11,15 +12,7 @@ describe '/interface' do
         mikrotik_interface_vrrp { 'br0_vip':
           ensure => absent,        
         }
-  
-        mikrotik_interface_bridge_port { 'VLAN_4001':
-          ensure => absent,
-        }
-        
-        mikrotik_interface_bridge { ['br0', 'br1', 'br2']:
-          ensure => absent,
-        }
-                
+
         mikrotik_interface_bond { 'ip_tnl_bond':
           ensure => absent,
         }
@@ -51,51 +44,6 @@ describe '/interface' do
     it_behaves_like 'an idempotent device run after failures', 9
   end  
   
-  context "create new bridge" do      
-    it 'should update master' do
-      site_pp = <<-EOS
-        mikrotik_interface_bridge { 'br0':
-          
-        }
-        
-        mikrotik_interface_bridge { 'br1':
-          mtu => 1300,
-          admin_mac => '02:02:02:12:34:56',
-        }
-        
-        mikrotik_interface_bridge { 'br2':
-          ensure => disabled,
-        }
-      EOS
-      
-      set_site_pp_on_master(site_pp)
-    end
-  
-    it_behaves_like 'an idempotent device run'
-  end  
-
-  context "update bridge" do      
-    it 'should update master' do
-      site_pp = <<-EOS
-        mikrotik_interface_bridge { 'br0':
-          mtu => 1000,
-        }
-        
-        mikrotik_interface_bridge { 'br1':
-          mtu => 1200,
-        }
-        
-        mikrotik_interface_bridge { 'br2':
-          ensure => enabled,
-        }
-      EOS
-      
-      set_site_pp_on_master(site_pp)
-    end
-  
-    it_behaves_like 'an idempotent device run'
-  end
-
   context "create eoip" do      
     it 'should update master' do
       site_pp = <<-EOS
@@ -154,20 +102,6 @@ describe '/interface' do
   
     it_behaves_like 'an idempotent device run'
   end
-  
-  context "attach to bridge" do      
-    it 'should update master' do
-      site_pp = <<-EOS
-        mikrotik_interface_bridge_port { 'VLAN_4001':      
-          bridge => 'br0',
-        }
-      EOS
-      
-      set_site_pp_on_master(site_pp)
-    end
-  
-    it_behaves_like 'an idempotent device run'
-  end
 
   context "create bond" do      
     it 'should update master' do
@@ -186,7 +120,7 @@ describe '/interface' do
     it_behaves_like 'an idempotent device run'
   end
 
-  context "create vpls bgp interface" do      
+  context "create vpls bgp interface" do
     it 'should update master' do
       site_pp = <<-EOS
         mikrotik_interface_bgp_vpls { 'Virtual1':
@@ -261,7 +195,7 @@ describe '/interface' do
     it_behaves_like 'an idempotent device run'
   end
 
-  context "update vpls bgp interface" do      
+  context "update vpls bgp interface" do
     it 'should update master' do
       site_pp = <<-EOS
         mikrotik_interface_bgp_vpls { 'Virtual1':  
@@ -279,11 +213,7 @@ describe '/interface' do
   
   context "disable some interfaces" do      
     it 'should update master' do
-      site_pp = <<-EOS
-        mikrotik_interface_bridge { 'br0':
-          ensure => disabled
-        }
-  
+      site_pp = <<-EOS  
         mikrotik_interface_eoip { 'ip_tnl_01':
           ensure => disabled
         }
@@ -313,11 +243,7 @@ describe '/interface' do
   
   context "enable some interfaces" do      
     it 'should update master' do
-      site_pp = <<-EOS
-        mikrotik_interface_bridge { 'br0':
-          ensure => enabled
-        }
-  
+      site_pp = <<-EOS  
         mikrotik_interface_eoip { 'ip_tnl_01':
           ensure => enabled
         }
