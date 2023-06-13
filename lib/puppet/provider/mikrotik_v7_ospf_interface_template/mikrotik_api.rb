@@ -40,7 +40,7 @@ Puppet::Type.type(:mikrotik_v7_ospf_interface_template).provide(:mikrotik_api, :
       :instance_id           => data['instance-id'],
       :cost                  => data['cost'],
       :priority              => data['priority'],
-      :passive               => data['passive'],   
+      :passive               => (!data['passive'].nil?).to_s,
       :authentication        => data['authentication'],
       :authentication_key    => data['authentication-key'],          
       :authentication_key_id => data['authentication-key-id'],
@@ -53,6 +53,21 @@ Puppet::Type.type(:mikrotik_v7_ospf_interface_template).provide(:mikrotik_api, :
     Puppet.debug("Flushing OSPF Interface #{resource[:name]}")
       
     params = {}
+
+    if @property_hash[:state] == :disabled
+      params["disabled"] = true
+    elsif @property_hash[:state] == :enabled
+      params["disabled"] = false
+    end
+
+    if resource[:passive] == true || resource[:passive] == :true
+      params["passive"] = true
+    else
+      #  TODO: BUGFIX: UNSETTING passive FAILS on 7.9
+      Puppet.warning("OSPF Interface Template - Unsetting -passive- is currently not possible through the API!")
+      params["passive"] = 'no'
+    end
+    
     params["comment"] = resource[:name]
     params["interfaces"] = resource[:interfaces].join(',') if ! resource[:interfaces].nil?
     params["area"] = resource[:area] if ! resource[:area].nil?
@@ -62,7 +77,6 @@ Puppet::Type.type(:mikrotik_v7_ospf_interface_template).provide(:mikrotik_api, :
     params["instance-id"] = resource[:instance_id] if ! resource[:instance_id].nil?
     params["cost"] = resource[:cost] if ! resource[:cost].nil?
     params["priority"] = resource[:priority] if ! resource[:priority].nil?
-    params["passive"] = resource[:passive] if ! resource[:passive].nil?      
     params["authentication"] = resource[:authentication] if ! resource[:authentication].nil?
     params["authentication-key"] = resource[:authentication_key] if ! resource[:authentication_key].nil?
     params["authentication-key-id"] = resource[:authentication_key_id] if ! resource[:authentication_key_id].nil?

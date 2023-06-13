@@ -117,6 +117,7 @@ describe 'v7: Routing OSPF' do
             interfaces => ['ether1'],
             cost       => 100,
             priority   => 20,
+            passive    => true,
           }
         EOS
         

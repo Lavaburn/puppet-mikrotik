@@ -30,7 +30,7 @@ Puppet::Type.type(:mikrotik_system).provide(:mikrotik_api_v7, :parent => Puppet:
     ntp_servers = Puppet::Provider::Mikrotik_Api::get_all("/system/ntp/client/servers")
     ntp_servers.each do |data|
       if data['dynamic'] == "false"
-        Puppet.info("NTP SVR: #{data.inspect}")
+        Puppet.debug("NTP SVR: #{data.inspect}")
         ntp_servers_data.push(data['address'])
       end
     end

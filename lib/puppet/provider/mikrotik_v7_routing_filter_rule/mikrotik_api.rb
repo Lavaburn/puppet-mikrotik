@@ -38,7 +38,7 @@ Puppet::Type.type(:mikrotik_v7_routing_filter_rule).provide(:mikrotik_api, :pare
         :name        => data['comment'],
         :chain       => data['chain'],
         :chain_order => chain_order.to_s,
-        :rule        => data['rule']
+        :rule        => data['rule']            # BUGFIX: ONLY RETRIEVES 1 LINE (\r\n) !!!
       )
     end
   end
