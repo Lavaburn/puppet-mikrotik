@@ -8,8 +8,8 @@ Puppet Module for managing Mikrotik Devices
 
 For local testing using RVM:
 	
-	rvm use 2.4.9
-	gem install bundler
+	rvm use 2.4.9 	OR	rbenv local 2.4.10
+	gem install bundler -v 2.3.0
 	bundle install --binstubs
 
 ### Acceptance Testing

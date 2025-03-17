@@ -1,8 +1,8 @@
 require_relative '../mikrotik_api'
 
-Puppet::Type.type(:mikrotik_tool_email).provide(:mikrotik_api_v7, :parent => Puppet::Provider::Mikrotik_Api) do
+Puppet::Type.type(:mikrotik_tool_email).provide(:mikrotik_api_v7_pre12, :parent => Puppet::Provider::Mikrotik_Api) do
   confine :feature => :mtik
-  confine :feature => :ros_v7
+  confine :feature => :ros_v7_pre12
   
   mk_resource_methods
 

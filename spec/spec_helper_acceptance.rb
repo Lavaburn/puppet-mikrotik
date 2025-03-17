@@ -23,6 +23,11 @@ RSpec.configure do |c|
     @testnodes = get_testnodes
     
     proj_root = File.expand_path(File.join(File.dirname(__FILE__), '..'))
+
+    # BUGFIX Puppet 5 + Puppet 6 ?
+    hosts.each do |host|
+      on host, 'apt remove -y puppet5-release'
+    end
       
     # Install the correct Puppet version
     #run_puppet_install_helper("agent", "5.5.10")

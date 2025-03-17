@@ -22,8 +22,15 @@ Puppet::Type.type(:mikrotik_radius_server).provide(:mikrotik_api, :parent => Pup
     if ! data['comment'].nil?
       services = data['service'].split(',')
       
+      if data['disabled'] == "true"
+        state = :disabled
+      else
+        state = :enabled
+      end   
+      
       new(
         :ensure            => :present,
+        :state             => state,
         :name              => data['comment'],
         :address           => data['address'],
         :services          => services,
@@ -35,7 +42,9 @@ Puppet::Type.type(:mikrotik_radius_server).provide(:mikrotik_api, :parent => Pup
         :timeout           => data['timeout'],
         :accounting_backup => data['accounting-backup'],
         :realm             => data['realm'],
-        :src_address       => data['src-address']
+        :src_address       => data['src-address'],
+        :require_msg_auth  => data['require-message-auth'],
+        :protocol          => data['protocol']
       )
     end
   end
@@ -45,11 +54,18 @@ Puppet::Type.type(:mikrotik_radius_server).provide(:mikrotik_api, :parent => Pup
       
     params = {}
     params["comment"] = resource[:name]
+
+    if @property_hash[:state] == :disabled
+      params["disabled"] = 'yes'
+    elsif @property_hash[:state] == :enabled
+      params["disabled"] = 'no'
+    end
+
     params["address"] = resource[:address] if ! resource[:address].nil?
     if ! resource[:services].nil?
       params["service"] = resource[:services].join(',')
-    end
-    # TODO
+    end 
+    
     params["called-id"] = resource[:called_id] if ! resource[:called_id].nil?
     params["domain"] = resource[:domain] if ! resource[:domain].nil?
     params["secret"] = resource[:secret] if ! resource[:secret].nil?
@@ -60,6 +76,9 @@ Puppet::Type.type(:mikrotik_radius_server).provide(:mikrotik_api, :parent => Pup
     params["accounting-backup"] = resource[:accounting_backup] if ! resource[:accounting_backup].nil?
     params["realm"] = resource[:realm] if ! resource[:realm].nil?
     params["src-address"] = resource[:src_address] if ! resource[:src_address].nil?
+
+    params["protocol"] = resource[:protocol] if ! resource[:protocol].nil?
+    params["require-message-auth"] = resource[:require_msg_auth] if ! resource[:require_msg_auth].nil?
 
     lookup = {}
     lookup["comment"] = resource[:name]

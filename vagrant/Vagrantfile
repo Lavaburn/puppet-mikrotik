@@ -17,3 +17,8 @@ Vagrant.configure("2") do |config|
     config.vbguest.auto_update = false
   end
 end
+
+## config.vm.box = "dulin/mikrotik" 
+## IS EXTREMELY OLD! - v6.37.4 only support LEGACY authentication => Use Winbox v3.41 !
+
+# =>  https://portal.cloud.hashicorp.com/vagrant/discover?query=mikrotik
