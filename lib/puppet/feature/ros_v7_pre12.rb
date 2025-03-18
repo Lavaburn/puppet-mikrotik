@@ -14,7 +14,6 @@ Puppet.features.add(:ros_v7_pre12) do
     end
 
     facts = Puppet::Util::NetworkDevice::Mikrotik::Facts.new(transport).retrieve
-    Puppet.warning("ROSv7: #{facts['version']}")
     if facts and facts['version'] =~ /^7\./
       minor = facts['version'].split('.')[1].to_i
       if minor < 12
