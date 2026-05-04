@@ -40,9 +40,9 @@ I will probably not add these myself...
 * PIM SM			/routing/pimsm
 * RIP				/routing/rip
 * RPKI				/routing/rpki
-* Router ID			/routing/id
+* ~~Router ID			/routing/id~~
 * Rules	 			/routing/rule
-* Tables			/routing/table
+* ~~Tables			/routing/table~~
 * Queues			/queue
 * BTest Server		/tool/bandwidth-server    
 * MAC Server		/tool/mac-server 

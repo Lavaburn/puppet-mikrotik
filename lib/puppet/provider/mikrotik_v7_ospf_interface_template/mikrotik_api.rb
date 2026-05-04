@@ -8,7 +8,7 @@ Puppet::Type.type(:mikrotik_v7_ospf_interface_template).provide(:mikrotik_api, :
 
   def self.instances    
     ospf_interfaces = Puppet::Provider::Mikrotik_Api::get_all("/routing/ospf/interface-template")
-    instances = ospf_interfaces.reject {|data| data['dynamic'] == 'true' }.collect { |ospf_interface| ospfInterface(ospf_interface) }
+    instances = ospf_interfaces.reject {|data| data['dynamic'] == 'true' || data['comment'].nil? || data['comment'].empty? }.collect { |ospf_interface| ospfInterface(ospf_interface) }
     instances
   end
 

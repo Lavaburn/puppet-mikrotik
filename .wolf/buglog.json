@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "bugs": [
+    {
+      "id": "bug-001",
+      "timestamp": "2026-05-04T11:39:33Z",
+      "error_message": "Error: Could not find a suitable provider for mikrotik_v7_ospf_interface_template (and other mikrotik_v7_* types) when running cli-puppet-device-full (all devices), but not when running cli-puppet-device-single --target ipt1.eadc.nairobi.rcswimax.com",
+      "file": "lib/puppet/provider/mikrotik_api.rb",
+      "root_cause": "Puppet's feature system (Puppet::Util::Feature) caches feature block results globally after first evaluation. In a multi-device puppet device run, ros_v7 is evaluated when a v6 device (eadc1/eadc2, which have mikrotik_mpls_ldp_instance with both v6+v7 providers) is processed before ipt1. The v6 device causes ros_v7 to cache 'false'. When ipt1 (RouterOS 7) is reached, ros_v7 returns cached 'false', making all mikrotik_v7_* providers appear unsuitable.",
+      "fix": "Added self.suitable? override to Puppet::Provider::Mikrotik_Api base class. It detects when NetworkDevice.current transport changes (new device being processed) and clears the @values cache entries for [:ros_v6, :ros_v7, :ros_v7_12, :ros_v7_pre12] from Puppet.features. This forces re-evaluation of version features for each new device. The last transport object_id is stored on the base class so the cache is cleared exactly once per device transition.",
+      "tags": ["puppet-device", "multi-device", "feature-cache", "ros_v7", "provider-selection", "mikrotik_v7"],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-04T11:39:33Z"
+    }
+  ]
+}

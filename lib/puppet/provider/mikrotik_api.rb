@@ -2,6 +2,24 @@ require_relative '../util/network_device/mikrotik'
 require_relative '../util/network_device/transport/mikrotik'
 
 class Puppet::Provider::Mikrotik_Api < Puppet::Provider
+  # Puppet's feature system caches results globally for the process lifetime.
+  # In a multi-device `puppet device` run, ros_v6/ros_v7 get evaluated for the
+  # first device processed and the cached result is reused for all subsequent
+  # devices — causing "Could not find a suitable provider" for v7 types when any
+  # v6 device appears earlier in device.conf. This override detects a transport
+  # change and clears the version feature cache so each device re-evaluates them.
+  def self.suitable?
+    current_transport_id = Puppet::Util::NetworkDevice.current&.transport&.object_id
+    base = Puppet::Provider::Mikrotik_Api
+    if current_transport_id && current_transport_id != base.instance_variable_get(:@_last_transport_id)
+      base.instance_variable_set(:@_last_transport_id, current_transport_id)
+      if (vals = Puppet.features.instance_variable_get(:@values))
+        [:ros_v6, :ros_v7, :ros_v7_12, :ros_v7_pre12].each { |f| vals.delete(f) }
+      end
+    end
+    super
+  end
+
   def self.prefetch(resources)
     nodes = instances
     resources.keys.each do |name|
