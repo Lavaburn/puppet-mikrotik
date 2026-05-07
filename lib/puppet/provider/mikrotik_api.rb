@@ -2,19 +2,35 @@ require_relative '../util/network_device/mikrotik'
 require_relative '../util/network_device/transport/mikrotik'
 
 class Puppet::Provider::Mikrotik_Api < Puppet::Provider
-  # Puppet's feature system caches results globally for the process lifetime.
-  # In a multi-device `puppet device` run, ros_v6/ros_v7 get evaluated for the
-  # first device processed and the cached result is reused for all subsequent
-  # devices — causing "Could not find a suitable provider" for v7 types when any
-  # v6 device appears earlier in device.conf. This override detects a transport
-  # change and clears the version feature cache so each device re-evaluates them.
+  # In a multi-device `puppet device` run two caches get stale when Puppet moves
+  # from one device to the next:
+  #
+  #   1. Puppet::Util::Feature caches feature results (@results) globally for the
+  #      process lifetime.  ros_v6/ros_v7 evaluated for device A are reused for
+  #      device B, selecting the wrong provider version.
+  #
+  #   2. Puppet::Type caches the selected @defaultprovider at the class level.
+  #      Once set to mikrotik_api_v6 (for a v6 device), that class-level cache is
+  #      returned for every subsequent device without re-evaluating suitability,
+  #      so all resources on a v7 device get the v6 provider and fail the confine.
+  #
+  # This override detects a transport change and flushes both caches so each
+  # device performs fresh provider selection.
   def self.suitable?
     current_transport_id = Puppet::Util::NetworkDevice.current&.transport&.object_id
     base = Puppet::Provider::Mikrotik_Api
     if current_transport_id && current_transport_id != base.instance_variable_get(:@_last_transport_id)
       base.instance_variable_set(:@_last_transport_id, current_transport_id)
+      # 1. Clear the feature result cache
       if (vals = Puppet.features.instance_variable_get(:@results))
         [:ros_v6, :ros_v7, :ros_v7_12, :ros_v7_pre12].each { |f| vals.delete(f) }
+      end
+      # 2. Clear the defaultprovider cache on every type whose cached default is
+      #    a Mikrotik provider, so Puppet re-selects based on the new device's features.
+      Puppet::Type.eachtype do |type|
+        next unless type
+        dp = type.instance_variable_get(:@defaultprovider)
+        type.instance_variable_set(:@defaultprovider, nil) if dp && dp <= base
       end
     end
     super
