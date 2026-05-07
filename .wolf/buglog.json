@@ -17,12 +17,12 @@
       "id": "bug-002",
       "timestamp": "2026-05-07T00:00:00Z",
       "error_message": "Error: Provider mikrotik_api_v6 is not functional on this host (for mikrotik_system, mikrotik_snmp_community, mikrotik_tool_email on ipt1.eadc.nairobi.rcswimax.com which is RouterOS v7)",
-      "file": "lib/puppet/provider/mikrotik_api.rb",
-      "root_cause": "Bug-001 fix only cleared Puppet::Util::Feature @results cache. However, Puppet::Type also caches @defaultprovider at the class level (in Puppet::Type.defaultprovider). When a v6 device runs first, @defaultprovider is set to mikrotik_api_v6 for types like mikrotik_system that have both v6+v7 providers. This cached class-level value is returned unchanged for subsequent devices (line 1764 in type.rb: 'return @defaultprovider if @defaultprovider'). Resources without an explicit provider are then assigned the v6 default, which then fails the confine check on the v7 device.",
-      "fix": "Extended self.suitable? override: after clearing the feature cache, also iterate all Puppet types via Puppet::Type.eachtype and clear @defaultprovider on any type whose cached default inherits from Puppet::Provider::Mikrotik_Api (checked with dp <= base). This forces Puppet to re-select the appropriate provider (v6 or v7) based on the fresh feature evaluation for each new device.",
-      "tags": ["puppet-device", "multi-device", "defaultprovider", "ros_v6", "ros_v7", "provider-selection", "mikrotik_system", "mikrotik_snmp_community", "mikrotik_tool_email"],
+      "file": "lib/puppet/provider/mikrotik_api.rb, lib/puppet/util/network_device/mikrotik/device.rb",
+      "root_cause": "TIMING BUG: the suitable? override clears caches correctly, but TOO LATE. Puppet assigns providers to ALL resources upfront via type.defaultprovider (which returns the stale cached @defaultprovider without calling suitable?). By the time suitable? is called during prefetch_if_necessary, resources are already committed to the wrong (v6) provider. Puppet 6 then fails them with 'not functional' instead of re-assigning. The bug-002 fix (clearing in suitable?) only helps types that happen to be processed AFTER another type whose suitable? first triggered the clearing — a race condition.",
+      "fix": "Moved the primary cache-clearing into Device#initialize (_reset_version_caches). This runs BEFORE the transaction assigns providers, so to_ral/defaultprovider sees nil @defaultprovider and calls suitable? fresh. Clears: (1) Puppet.features @results for ros_v6/v7/v7_12/v7_pre12, (2) @defaultprovider on all types whose cached provider name starts with 'mikrotik_api_v'. The suitable? override in mikrotik_api.rb is retained as a secondary defence.",
+      "tags": ["puppet-device", "multi-device", "defaultprovider", "ros_v6", "ros_v7", "provider-selection", "mikrotik_system", "mikrotik_snmp_community", "mikrotik_tool_email", "timing"],
       "related_bugs": ["bug-001"],
-      "occurrences": 1,
+      "occurrences": 2,
       "last_seen": "2026-05-07T00:00:00Z"
     }
   ]
