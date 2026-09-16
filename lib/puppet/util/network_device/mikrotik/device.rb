@@ -8,7 +8,7 @@ class Puppet::Util::NetworkDevice::Mikrotik::Device
 
   # Features whose cached results must be cleared on each device transition so
   # that ros_v6/ros_v7 are re-evaluated against the new device.
-  MIKROTIK_VERSION_FEATURES = [:ros_v6, :ros_v7, :ros_v7_12, :ros_v7_pre12].freeze
+  MIKROTIK_VERSION_FEATURES = [:ros_v6, :ros_v7, :ros_v7_12, :ros_v7_pre12, :ros_v7_20].freeze
 
   def initialize(url, options = {})
     # Puppet 5 support

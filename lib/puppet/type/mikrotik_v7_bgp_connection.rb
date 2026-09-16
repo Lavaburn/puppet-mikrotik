@@ -52,6 +52,10 @@ Puppet::Type.newtype(:mikrotik_v7_bgp_connection) do
     desc 'The BGP templates to inherit'
   end
 
+  newproperty(:instance) do
+    desc 'The BGP instance (ROS 7.20+).'
+  end
+
   newproperty(:as) do
     desc 'The Autonomous System Number (ASN).'
   end

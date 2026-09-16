@@ -9,7 +9,16 @@ Puppet::Type.type(:mikrotik_v7_bgp_connection).provide(:mikrotik_api, :parent =>
   def self.instances    
     bgp_peers = Puppet::Provider::Mikrotik_Api::get_all("/routing/bgp/connection")
     instances = bgp_peers.collect { |bgp_peer| bgpPeer(bgp_peer) }    
+    @afi_key = instances.map(&:afi_key_hint).compact.first
     instances
+  end
+
+  def self.afi_key
+    @afi_key
+  end
+
+  def afi_key_hint
+    @property_hash[:afi_key]
   end
   
   def self.bgpPeer(data) 
@@ -21,9 +30,11 @@ Puppet::Type.type(:mikrotik_v7_bgp_connection).provide(:mikrotik_api, :parent =>
       state = :enabled
     end     
 
+    # ROS 7.x renamed address-families to afi
+    afi_key = ['afi', 'address-families'].find { |k| data.key?(k) }
     address_families = []
-    if !data['address-families'].nil?
-      address_families = data['address-families'].split(',')
+    if !afi_key.nil?
+      address_families = data[afi_key].split(',')
     end
 
     templates = []
@@ -41,8 +52,10 @@ Puppet::Type.type(:mikrotik_v7_bgp_connection).provide(:mikrotik_api, :parent =>
     :state                    => state,
     :name                     => data['name'],
     :templates                => templates,
+    :instance                 => data['instance'],
     :as                       => data['as'],
     :address_families         => address_families,
+    :afi_key                  => afi_key,
     :router_id                => data['router-id'],
     :remote_address           => data['remote.address'],
     :remote_port              => data['remote.port'],
@@ -103,9 +116,11 @@ Puppet::Type.type(:mikrotik_v7_bgp_connection).provide(:mikrotik_api, :parent =>
 
     params["name"] = resource[:name]
     params["templates"] = resource[:templates].join(',') if ! resource[:templates].nil?
+    params["instance"] = resource[:instance] if ! resource[:instance].nil?
     params["as"] = resource[:as] if ! resource[:as].nil?
-    params["address-families"] = resource[:address_families].join(',') if ! resource[:address_families].nil?    
-    params["router-id"] = resource[:router_id] if ! resource[:router_id].nil?
+    afi_key = @property_hash[:afi_key] || self.class.afi_key
+    params[afi_key || 'afi'] = resource[:address_families].join(',') if ! resource[:address_families].nil?
+    params["router-id"] = resource[:router_id] if ! resource[:router_id].nil? && ! Puppet.features.ros_v7_20?  # 7.20+: set on mikrotik_v7_bgp_instance
     params["remote.address"] = resource[:remote_address] if ! resource[:remote_address].nil?
     params["remote.port"] = resource[:remote_port] if ! resource[:remote_port].nil?
     params["remote.as"] = resource[:remote_as] if ! resource[:remote_as].nil?
@@ -156,6 +171,14 @@ Puppet::Type.type(:mikrotik_v7_bgp_connection).provide(:mikrotik_api, :parent =>
     
     Puppet.debug("Params: #{params.inspect} - Lookup: #{lookup.inspect}")
 
-    simple_flush("/routing/bgp/connection", params, lookup)
+    begin
+      simple_flush("/routing/bgp/connection", params, lookup)
+    rescue => e
+      # No existing object to learn the key from: retry with the pre-rename name
+      raise if afi_key || !params.key?('afi')
+      Puppet.debug("Retrying with address-families: #{e.message}")
+      params['address-families'] = params.delete('afi')
+      simple_flush("/routing/bgp/connection", params, lookup)
+    end
   end  
 end

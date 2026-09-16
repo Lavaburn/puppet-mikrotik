@@ -13,7 +13,7 @@ class Puppet::Provider::Mikrotik_Api < Puppet::Provider
     if current_transport_id && current_transport_id != base.instance_variable_get(:@_last_transport_id)
       base.instance_variable_set(:@_last_transport_id, current_transport_id)
       if (vals = Puppet.features.instance_variable_get(:@results))
-        [:ros_v6, :ros_v7, :ros_v7_12, :ros_v7_pre12].each { |f| vals.delete(f) }
+        [:ros_v6, :ros_v7, :ros_v7_12, :ros_v7_pre12, :ros_v7_20].each { |f| vals.delete(f) }
       end
       Puppet::Type.eachtype do |type|
         next unless type
