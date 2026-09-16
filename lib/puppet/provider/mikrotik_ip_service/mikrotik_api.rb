@@ -9,6 +9,8 @@ Puppet::Type.type(:mikrotik_ip_service).provide(:mikrotik_api, :parent => Puppet
     instances = []
     
     services = get_all("/ip/service")
+    # ROS 7.19+: skip dynamic per-connection entries
+    services = services.reject { |service| service['dynamic'] == 'true' || service['connection'] == 'true' }
     instances = services.collect { |service| ipService(service) }
     
     instances
@@ -28,7 +30,7 @@ Puppet::Type.type(:mikrotik_ip_service).provide(:mikrotik_api, :parent => Puppet
       :state     => state,
       :name      => service['name'],
       :port      => service['port'],
-      :addresses => service['address'].split(',')
+      :addresses => service['address'].to_s.split(',')
     )
   end
 
