@@ -14,8 +14,15 @@ Puppet::Type.type(:mikrotik_v7_bgp_instance).provide(:mikrotik_api, :parent => P
   end
 
   def self.bgpInstance(data)
+    if data['disabled'] == "true"
+      state = :disabled
+    else
+      state = :enabled
+    end
+
     new(
       :ensure     => :present,
+      :state      => state,
       :name       => data['name'],
       :as         => data['as'],
       :router_id  => data['router-id'],
