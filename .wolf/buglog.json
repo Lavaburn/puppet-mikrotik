@@ -7,8 +7,15 @@
       "error_message": "Error: Could not find a suitable provider for mikrotik_v7_ospf_interface_template (and other mikrotik_v7_* types) when running cli-puppet-device-full (all devices), but not when running cli-puppet-device-single --target ipt1.eadc.nairobi.rcswimax.com",
       "file": "lib/puppet/provider/mikrotik_api.rb",
       "root_cause": "Puppet's feature system (Puppet::Util::Feature) caches feature block results globally after first evaluation. In a multi-device puppet device run, ros_v7 is evaluated when a v6 device (eadc1/eadc2, which have mikrotik_mpls_ldp_instance with both v6+v7 providers) is processed before ipt1. The v6 device causes ros_v7 to cache 'false'. When ipt1 (RouterOS 7) is reached, ros_v7 returns cached 'false', making all mikrotik_v7_* providers appear unsuitable.",
-      "fix": "Added self.suitable? override to Puppet::Provider::Mikrotik_Api base class. It detects when NetworkDevice.current transport changes (new device being processed) and clears the feature cache entries for [:ros_v6, :ros_v7, :ros_v7_12, :ros_v7_pre12] from Puppet.features. This forces re-evaluation of version features for each new device. The last transport object_id is stored on the base class so the cache is cleared exactly once per device transition. NOTE: initial implementation used @values (wrong ivar) — the correct ivar is @results (Puppet::Util::Feature internal cache, both Puppet 6 and 7). Fixed 2026-05-06.",
-      "tags": ["puppet-device", "multi-device", "feature-cache", "ros_v7", "provider-selection", "mikrotik_v7"],
+      "fix": "Added self.suitable? override to Puppet::Provider::Mikrotik_Api base class. It detects when NetworkDevice.current transport changes (new device being processed) and clears the feature cache entries for [:ros_v6, :ros_v7, :ros_v7_12, :ros_v7_pre12] from Puppet.features. This forces re-evaluation of version features for each new device. The last transport object_id is stored on the base class so the cache is cleared exactly once per device transition. NOTE: initial implementation used @values (wrong ivar) \u2014 the correct ivar is @results (Puppet::Util::Feature internal cache, both Puppet 6 and 7). Fixed 2026-05-06.",
+      "tags": [
+        "puppet-device",
+        "multi-device",
+        "feature-cache",
+        "ros_v7",
+        "provider-selection",
+        "mikrotik_v7"
+      ],
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-05-04T11:39:33Z"
@@ -18,12 +25,44 @@
       "timestamp": "2026-05-07T00:00:00Z",
       "error_message": "Error: Provider mikrotik_api_v6 is not functional on this host (for mikrotik_system, mikrotik_snmp_community, mikrotik_tool_email on ipt1.eadc.nairobi.rcswimax.com which is RouterOS v7)",
       "file": "lib/puppet/provider/mikrotik_api.rb, lib/puppet/util/network_device/mikrotik/device.rb",
-      "root_cause": "TIMING BUG: the suitable? override clears caches correctly, but TOO LATE. Puppet assigns providers to ALL resources upfront via type.defaultprovider (which returns the stale cached @defaultprovider without calling suitable?). By the time suitable? is called during prefetch_if_necessary, resources are already committed to the wrong (v6) provider. Puppet 6 then fails them with 'not functional' instead of re-assigning. The bug-002 fix (clearing in suitable?) only helps types that happen to be processed AFTER another type whose suitable? first triggered the clearing — a race condition.",
+      "root_cause": "TIMING BUG: the suitable? override clears caches correctly, but TOO LATE. Puppet assigns providers to ALL resources upfront via type.defaultprovider (which returns the stale cached @defaultprovider without calling suitable?). By the time suitable? is called during prefetch_if_necessary, resources are already committed to the wrong (v6) provider. Puppet 6 then fails them with 'not functional' instead of re-assigning. The bug-002 fix (clearing in suitable?) only helps types that happen to be processed AFTER another type whose suitable? first triggered the clearing \u2014 a race condition.",
       "fix": "Moved the primary cache-clearing into Device#initialize (_reset_version_caches). This runs BEFORE the transaction assigns providers, so to_ral/defaultprovider sees nil @defaultprovider and calls suitable? fresh. Clears: (1) Puppet.features @results for ros_v6/v7/v7_12/v7_pre12, (2) @defaultprovider on all types whose cached provider name starts with 'mikrotik_api_v'. The suitable? override in mikrotik_api.rb is retained as a secondary defence.",
-      "tags": ["puppet-device", "multi-device", "defaultprovider", "ros_v6", "ros_v7", "provider-selection", "mikrotik_system", "mikrotik_snmp_community", "mikrotik_tool_email", "timing"],
-      "related_bugs": ["bug-001"],
+      "tags": [
+        "puppet-device",
+        "multi-device",
+        "defaultprovider",
+        "ros_v6",
+        "ros_v7",
+        "provider-selection",
+        "mikrotik_system",
+        "mikrotik_snmp_community",
+        "mikrotik_tool_email",
+        "timing"
+      ],
+      "related_bugs": [
+        "bug-001"
+      ],
       "occurrences": 2,
       "last_seen": "2026-05-07T00:00:00Z"
+    },
+    {
+      "id": "bug-003",
+      "timestamp": "2026-09-16T00:00:00Z",
+      "error_message": "Mikrotik_v7_bgp_instance[RCS]/ensure: current_value 'absent', should be 'present' although instance exists",
+      "file": "lib/puppet/provider/mikrotik_v7_bgp_instance/mikrotik_api.rb",
+      "root_cause": "type ensure uses provider.getState which reads @property_hash[:state]; provider never set :state",
+      "fix": "set :state (enabled/disabled from data['disabled']) in bgpInstance",
+      "tags": [
+        "ensurable",
+        "getState",
+        "state",
+        "bgp",
+        "ros_v7_20",
+        "mikrotik_v7_router_id"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-09-16T00:00:00Z"
     }
   ]
 }

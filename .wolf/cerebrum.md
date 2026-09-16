@@ -9,6 +9,7 @@
 <!-- How the user likes things done. Code style, tools, patterns, communication. -->
 
 ## Key Learnings
+- ROS 7.20+: BGP router-id/ASN live on /routing/bgp/instance (mikrotik_v7_bgp_instance, feature ros_v7_20); template/connection key is `afi` not `address-families`.
 
 - **Project:** puppet-mikrotik
 - **Description:** Puppet Module for managing Mikrotik Devices
@@ -19,6 +20,7 @@
 - **Provider cache clearing must happen BEFORE provider assignment, not in suitable?:** Puppet assigns providers to all resources upfront via `type.defaultprovider`. If `@defaultprovider` is stale, it is returned without calling `suitable?`. By the time `suitable?` runs (in `prefetch_if_necessary`), resources are already committed to the wrong provider — Puppet 6 then fails them with "not functional" rather than re-assigning. Fix: clear `@defaultprovider` and feature cache in `Device#initialize` (`_reset_version_caches`), which runs before the transaction assigns providers. The `suitable?` override is kept as a secondary defence only.
 
 ## Do-Not-Repeat
+- 2026-09-16: ensurable types using provider.getState need the provider to set :state in instances (mikrotik_v7_router_id lacks it too — always reports absent).
 
 <!-- Mistakes made and corrected. Each entry prevents the same mistake recurring. -->
 <!-- Format: [YYYY-MM-DD] Description of what went wrong and what to do instead. -->

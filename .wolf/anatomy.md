@@ -1009,3 +1009,10 @@
 ## vagrant/.vagrant/rgloader/
 
 - `loader.rb` — SPDX-License-Identifier: BUSL-1.1 (~113 tok)
+
+## lib/puppet/provider/mikrotik_v7_bgp_instance/
+
+- `mikrotik_api.rb` — /routing/bgp/instance provider (ROS 7.20+): as, router-id, vrf, cluster-id (~450 tok)
+
+- `lib/puppet/type/mikrotik_v7_bgp_instance.rb` — BGP instance type (ROS 7.20+) (~400 tok)
+- `lib/puppet/feature/ros_v7_20.rb` — feature: ROS 7.x minor >= 20 (~200 tok)
