@@ -1,6 +1,6 @@
 {
   "name": "puppet-mikrotik",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "author": "Lavaburn",
   "summary": "This module provides resources for managing a Mikrotik device.",
   "license": "Apache 2.0",

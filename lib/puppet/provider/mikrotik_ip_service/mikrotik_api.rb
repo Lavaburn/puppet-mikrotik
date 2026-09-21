@@ -52,12 +52,13 @@ Puppet::Type.type(:mikrotik_ip_service).provide(:mikrotik_api, :parent => Puppet
       params["address"] = resource[:addresses].join(',')
     end
              
-    lookup = { "name" => resource[:name] }
-    
-    id_list = Puppet::Provider::Mikrotik_Api::lookup_id(path, lookup)
-    id_list.each do |id|
-      params = params.merge({ ".id" => id })
-      result = Puppet::Provider::Mikrotik_Api::set(path, params)
+    # ROS 7.19+: /ip/service carries a dynamic row per live connection - our own
+    # API session shows up as `api`; set on it => "this is configured elsewhere".
+    services = self.class.get_all(path).select { |service|
+      service['name'] == resource[:name] && service['dynamic'] != 'true' && service['connection'] != 'true'
+    }
+    services.each do |service|
+      result = Puppet::Provider::Mikrotik_Api::set(path, params.merge({ ".id" => service['.id'] }))
     end
   end  
 end
