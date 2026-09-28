@@ -13,8 +13,15 @@ Puppet::Type.type(:mikrotik_v7_routing_table).provide(:mikrotik_api, :parent => 
   end
 
   def self.routingTable(data)
+    if data['disabled'] == "true"
+      state = :disabled
+    else
+      state = :enabled
+    end
+
     new(
       :ensure  => :present,
+      :state   => state,
       :name    => data['name'],
       :fib     => data['fib'],
       :comment => data['comment']
