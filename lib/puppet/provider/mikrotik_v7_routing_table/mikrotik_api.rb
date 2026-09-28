@@ -19,11 +19,14 @@ Puppet::Type.type(:mikrotik_v7_routing_table).provide(:mikrotik_api, :parent => 
       state = :enabled
     end
 
+    # fib is a flag: API returns 'fib=' (empty) when set and omits it when unset.
+    fib = data.key?('fib') && ['', 'true', 'yes'].include?(data['fib']) ? :true : :false
+
     new(
       :ensure  => :present,
       :state   => state,
       :name    => data['name'],
-      :fib     => data['fib'],
+      :fib     => fib,
       :comment => data['comment']
     )
   end
