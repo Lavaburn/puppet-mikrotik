@@ -30,7 +30,8 @@ Puppet::Type.type(:mikrotik_ip_service).provide(:mikrotik_api, :parent => Puppet
       :state     => state,
       :name      => service['name'],
       :port      => service['port'],
-      :addresses => service['address'].to_s.split(',')
+      # ROS 7.24+ renamed address to available-from
+      :addresses => (service['available-from'] || service['address']).to_s.split(',')
     )
   end
 
@@ -48,9 +49,6 @@ Puppet::Type.type(:mikrotik_ip_service).provide(:mikrotik_api, :parent => Puppet
     end
     
     params["port"] = resource[:port] if ! resource[:port].nil?   
-    if ! resource[:addresses].nil?
-      params["address"] = resource[:addresses].join(',')
-    end
              
     # ROS 7.19+: /ip/service carries a dynamic row per live connection - our own
     # API session shows up as `api`; set on it => "this is configured elsewhere".
@@ -58,7 +56,13 @@ Puppet::Type.type(:mikrotik_ip_service).provide(:mikrotik_api, :parent => Puppet
       service['name'] == resource[:name] && service['dynamic'] != 'true' && service['connection'] != 'true'
     }
     services.each do |service|
-      result = Puppet::Provider::Mikrotik_Api::set(path, params.merge({ ".id" => service['.id'] }))
+      service_params = params.merge({ ".id" => service['.id'] })
+      if ! resource[:addresses].nil?
+        # Write the key the device reports (available-from on ROS 7.24+)
+        key = service.key?('available-from') ? 'available-from' : 'address'
+        service_params[key] = resource[:addresses].join(',')
+      end
+      result = Puppet::Provider::Mikrotik_Api::set(path, service_params)
     end
   end  
 end

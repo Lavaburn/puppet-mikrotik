@@ -1,6 +1,6 @@
-# TODO list (for ROSv7)
+# UNIMPLEMENTED
 
-I will probably not add these myself...
+These features are not yet implemented by the module, as I don't use them
 
 * CAPsMAN			/caps-man  
 * ARP				/ip/arp
