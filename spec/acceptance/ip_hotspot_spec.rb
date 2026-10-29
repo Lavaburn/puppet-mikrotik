@@ -94,3 +94,85 @@ describe '/ip/hotspot' do
     it_behaves_like 'an idempotent device run'
   end
 end
+
+# Should be tested on:
+# ROS v6.49
+# ROS v7
+describe '/ip/hotspot/walled-garden' do
+  before { skip("Skipping this test for now") }
+  
+  include_context 'testnodes defined'
+
+  context "reset configuration" do      
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_ip_hotspot_walled_garden { 'wg_portal':
+          ensure => absent,
+        }
+        mikrotik_ip_hotspot_walled_garden_ip { 'wg_ip_dns':
+          ensure => absent,
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run after failures', 2
+  end  
+  
+  context "add entries" do
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_ip_hotspot_walled_garden { 'wg_portal':
+          action   => allow,
+          dst_host => '*.rcswimax.com',
+        }
+        mikrotik_ip_hotspot_walled_garden_ip { 'wg_ip_dns':
+          action      => accept,
+          dst_address => '8.8.8.8',
+          protocol    => 'udp',
+          dst_port    => '53',
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+  
+  context "disable entries" do
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_ip_hotspot_walled_garden { 'wg_portal':
+          ensure      => disabled,
+          http_method => 'GET',
+        }
+        mikrotik_ip_hotspot_walled_garden_ip { 'wg_ip_dns':
+          ensure => disabled,
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+  
+  context "remove entries" do
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_ip_hotspot_walled_garden { 'wg_portal':
+          ensure => absent,
+        }
+        mikrotik_ip_hotspot_walled_garden_ip { 'wg_ip_dns':
+          ensure => absent,
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+end

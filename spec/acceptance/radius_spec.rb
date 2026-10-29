@@ -176,3 +176,43 @@ describe 'v7: /radius' do
     it_behaves_like 'an idempotent device run'
   end
 end
+
+# Should be tested on:
+# ROS v6.49 - vrf warns and is ignored
+# ROS v7
+describe '/radius incoming' do
+  before { skip("Skipping this test for now") }
+  
+  include_context 'testnodes defined'
+
+  context "accept CoA" do
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_radius_incoming { 'radius_incoming':
+          accept => true,
+          port   => 3799,
+          vrf    => 'main',
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+  
+  context "reset configuration" do
+    it 'should update master' do
+      site_pp = <<-EOS
+        mikrotik_radius_incoming { 'radius_incoming':
+          accept => false,
+          port   => 3799,
+        }
+      EOS
+      
+      set_site_pp_on_master(site_pp)
+    end
+  
+    it_behaves_like 'an idempotent device run'
+  end
+end

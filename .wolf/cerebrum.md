@@ -20,6 +20,7 @@
 - **Provider cache clearing must happen BEFORE provider assignment, not in suitable?:** Puppet assigns providers to all resources upfront via `type.defaultprovider`. If `@defaultprovider` is stale, it is returned without calling `suitable?`. By the time `suitable?` runs (in `prefetch_if_necessary`), resources are already committed to the wrong provider — Puppet 6 then fails them with "not functional" rather than re-assigning. Fix: clear `@defaultprovider` and feature cache in `Device#initialize` (`_reset_version_caches`), which runs before the transaction assigns providers. The `suitable?` override is kept as a secondary defence only.
 
 ## Do-Not-Repeat
+- 2026-10-29: never name a property `method` or `path` — mk_resource_methods defines them on the provider (shadows Object#method / Logging path); use http_method/http_path.
 - 2026-09-16: ensurable types using provider.getState need the provider to set :state in instances (mikrotik_v7_router_id lacks it too — always reports absent).
 
 <!-- Mistakes made and corrected. Each entry prevents the same mistake recurring. -->

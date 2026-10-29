@@ -231,6 +231,14 @@
 
 - `mikrotik_api.rb` — self, self, flush (~592 tok)
 
+## lib/puppet/provider/mikrotik_ip_hotspot_walled_garden/
+
+- `mikrotik_api.rb` — self, self, flush; comment = title, skips dynamic (~600 tok)
+
+## lib/puppet/provider/mikrotik_ip_hotspot_walled_garden_ip/
+
+- `mikrotik_api.rb` — self, self, flush; comment = title, skips dynamic (~600 tok)
+
 ## lib/puppet/provider/mikrotik_ip_hotspot_profile/
 
 - `mikrotik_api.rb` — self, self, flush (~1061 tok)
@@ -406,6 +414,10 @@
 
 - `mikrotik_api.rb` — self, self, flush (~1291 tok)
 
+## lib/puppet/provider/mikrotik_radius_incoming/
+
+- `mikrotik_api.rb` — self, self, vrf (v6 warn), flush (~520 tok)
+
 ## lib/puppet/provider/mikrotik_radius_server/
 
 - `mikrotik_api.rb` — self, self, flush (~811 tok)
@@ -557,6 +569,8 @@
 - `mikrotik_interface_vrrp.rb` — retrieve, insync (~659 tok)
 - `mikrotik_ip_address.rb` — retrieve, insync (~311 tok)
 - `mikrotik_ip_hotspot_profile.rb` — insync (~509 tok)
+- `mikrotik_ip_hotspot_walled_garden.rb` — retrieve, insync; dst_host, http_path/http_method (~520 tok)
+- `mikrotik_ip_hotspot_walled_garden_ip.rb` — retrieve, insync; dst_address, protocol (~520 tok)
 - `mikrotik_ip_hotspot.rb` — retrieve, insync (~441 tok)
 - `mikrotik_ip_pool.rb` — insync (~151 tok)
 - `mikrotik_ip_route_rule.rb` — retrieve, insync (~427 tok)
@@ -599,6 +613,7 @@
 - `mikrotik_ppp_profile.rb` — Declares for (~732 tok)
 - `mikrotik_ppp_secret.rb` — retrieve, insync, insync (~512 tok)
 - `mikrotik_ppp_server.rb` — retrieve, insync, insync, insync (~695 tok)
+- `mikrotik_radius_incoming.rb` — singleton /radius incoming: accept, port, vrf (~200 tok)
 - `mikrotik_radius_server.rb` — retrieve, insync, insync (~624 tok)
 - `mikrotik_romon_port.rb` — retrieve, insync, insync (~411 tok)
 - `mikrotik_romon.rb` — retrieve, insync, insync (~370 tok)
